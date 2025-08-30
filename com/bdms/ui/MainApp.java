@@ -1,10 +1,14 @@
 
-package com.bdms.ui; 
- 
+package com.bdms.ui;  
+import com.bdms.model.Donor; 
+import com.bdms.service.DonorService; 
+import java.time.LocalDate;
 import java.util.Scanner; 
  
 class MainApp { 
     private static Scanner sc = new Scanner(System.in); 
+    private static DonorService donorService = new DonorService(); 
+
 public static void main(String[] args) { 
         System.out.println("=== Blood Donor Management System ==="); 
         while (true) { 
@@ -13,28 +17,19 @@ public static void main(String[] args) {
  
             switch (choice) { 
                 case "1": 
-                    System.out.println("[Stub] Register Donor selected"); 
-                    // To be implemented: call DonorService.registerDonor() 
+                    AddDonorUI();
                     break; 
                 case "2": 
-                    System.out.println("[Stub] Search Donor selected");
-                 // To be implemented: call DonorService.searchDonors() 
+                    searchDonorUI();
                     break; 
                 case "3": 
-                    System.out.println("[Stub] List All Donors selected"); 
-                    // To be implemented: call DonorService.listAllDonors() 
+                    ViewAllDonorsUI();
                     break; 
                 case "4": 
-                    System.out.println("[Stub] Update Donor selected"); 
-                    // To be implemented: call DonorService.updateDonor() 
+                    updateDonorUI();
                     break; 
                 case "5": 
-                    System.out.println("[Stub] Delete Donor selected"); 
-                    // To be implemented: call DonorService.deleteDonor() 
-                    break; 
-                case "6": 
-                    System.out.println("[Stub] Check Eligibility selected"); 
-                    // To be implemented: call DonorService.checkEligibility() 
+                    deleteDonorUI();
                     break; 
                 case "0": 
                     System.out.println("Exiting... Goodbye!"); 
@@ -44,8 +39,7 @@ public static void main(String[] args) {
                     System.out.println("Invalid choice! Please try again."); 
             } 
         } 
-    } 
- 
+    }     
     private static void showMenu() { 
         System.out.println("\nMenu:"); 
         System.out.println("1. Register Donor"); 
@@ -58,3 +52,26 @@ public static void main(String[] args) {
         System.out.print("Enter choice: "); 
     } 
 }
+
+  private static void addDonorUI() { 
+        System.out.println("\n=== Register Donor ==="); 
+        System.out.print("Name: "); 
+        String name = sc.nextLine(); 
+        System.out.print("Age: "); 
+        int age = Integer.parseInt(sc.nextLine()); 
+        System.out.print("Gender: "); 
+        String gender = sc.nextLine(); 
+        System.out.print("Blood Group: "); 
+        String bloodGroup = sc.nextLine(); 
+        System.out.print("Phone: "); 
+        String phone = sc.nextLine(); 
+        System.out.print("City: "); 
+        String city = sc.nextLine(); 
+ 
+        Donor donor = new Donor(name, age, gender, bloodGroup, phone, city, LocalDate.now()); 
+        donorService.addDonor(donor); 
+        System.out.println(" Donor registered successfully!"); 
+    }
+ 
+    
+
