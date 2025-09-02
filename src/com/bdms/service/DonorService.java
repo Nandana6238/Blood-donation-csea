@@ -11,7 +11,8 @@ public class DonorService {
         this.donorDAO = new DonorDAO();
     }
 
-    // Add donor (if your DAO.addDonor returns boolean, change this to return boolean)
+    // Add donor (if your DAO.addDonor returns boolean, change this to return
+    // boolean)
     public void addDonor(Donor donor) {
         donorDAO.addDonor(donor);
     }
@@ -21,13 +22,20 @@ public class DonorService {
         return donorDAO.getAllDonors();
     }
 
-    // Update donor — returns true if updated (assumes donorDAO.updateDonor returns boolean)
+    // Update donor — returns true if updated (assumes donorDAO.updateDonor returns
+    // boolean)
     public boolean updateDonor(int id, String phone, String city) {
         return donorDAO.updateDonor(id, phone, city);
     }
 
-    // Delete donor — returns true if deleted (assumes donorDAO.deleteDonor returns boolean)
+    // Delete donor — returns true if deleted (assumes donorDAO.deleteDonor returns
+    // boolean)
     public boolean deleteDonor(int id) {
         return donorDAO.deleteDonor(id);
+    }
+
+    public Object search(String string, String string2) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'search'");
     }
 }
