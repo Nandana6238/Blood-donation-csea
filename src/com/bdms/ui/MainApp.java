@@ -1,5 +1,4 @@
 
-
 package com.bdms.ui;
 
 import com.bdms.model.Donor;
@@ -7,7 +6,6 @@ import com.bdms.service.DonorService;
 import java.time.LocalDate;
 import java.util.Scanner;
 import com.bdms.dao.DonorDAO;
-import com.bdms.model.Donor;
 import java.util.List;
 
 public class MainApp {
@@ -22,6 +20,7 @@ public class MainApp {
             String choice = sc.nextLine().trim();
 
             switch (choice) {
+
                 case "1": // Add Donor 
                   try { 
                     System.out.print("Enter Name: "); 
@@ -53,6 +52,7 @@ public class MainApp {
                 case "3":
                     viewAllDonorsUI();
                     break;
+                
                 case "4": // Update Donor 
                   try { 
                     System.out.print("Enter Donor ID to update: "); 

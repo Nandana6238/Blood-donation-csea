@@ -12,6 +12,19 @@ public class Donor {
     private String city;
     private LocalDate lastDonationDate;
 
+
+     public Donor(String name, int age, String gender, String bloodGroup, String phone, String city, LocalDate lastDonationDate) {
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+        this.bloodGroup = bloodGroup;
+        this.phone = phone;
+        this.city = city;
+        this.lastDonationDate = lastDonationDate;
+    }
+
+    public Donor() { }
+
     // Getters and Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
