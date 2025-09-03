@@ -4,10 +4,8 @@ package com.bdms.ui;
 import com.bdms.model.Donor;
 import com.bdms.service.DonorService;
 import java.time.LocalDate;
-import java.util.Scanner;
-import com.bdms.dao.DonorDAO;
 import java.util.List;
-
+import java.util.Scanner;
 public class MainApp {
     private static Scanner sc = new Scanner(System.in);
     private static DonorService donorService = new DonorService();
