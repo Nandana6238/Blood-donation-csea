@@ -50,19 +50,9 @@ public class MainApp {
                 case "2":
                     searchDonorUI();
                     break;
-                case "3"://viewAllDonors
-    private static void viewAllDonorsUI() {
-    System.out.println("\n=== Donor List ===");
-    List<Donor> donors = donorService.getAllDonors();
-
-    if (donors == null || donors.isEmpty()) {
-        System.out.println("No donors found.");
-        return;
-    }
-    for (Donor d : donors) {
-        System.out.println(d);
-    }
-    }           
+                case "3":
+                    viewAllDonorsUI();
+                    break;
                 case "4": // Update Donor 
                   try { 
                     System.out.print("Enter Donor ID to update: "); 
