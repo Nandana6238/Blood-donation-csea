@@ -7,12 +7,12 @@ public class TestSearch {
         DonorService service = new DonorService();
 
         System.out.println("=== Searching A+ in Delhi ===");
-        service.search("A+", "Delhi").forEach(System.out::println);
+        service.searchDonors("A+", "Delhi").forEach(System.out::println);
 
         System.out.println("\n=== Searching O+ in Kochi ===");
-        service.search("O+", "Kochi").forEach(System.out::println);
+        service.searchDonors("O+", "Kochi").forEach(System.out::println);
 
         System.out.println("\n=== Searching B- in Delhi ===");
-        service.search("B-", "Delhi").forEach(System.out::println);
+        service.searchDonors("B-", "Delhi").forEach(System.out::println);
     }
 }
