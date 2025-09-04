@@ -5,37 +5,34 @@ import com.bdms.model.Donor;
 import java.util.List;
 
 public class DonorService {
-    private DonorDAO donorDAO;
+    private final DonorDAO donorDAO;
 
     public DonorService() {
         this.donorDAO = new DonorDAO();
     }
 
-    // Add donor (if your DAO.addDonor returns boolean, change this to return
-    // boolean)
+    // ✅ Add donor
     public void addDonor(Donor donor) {
         donorDAO.addDonor(donor);
     }
 
-    // Get all donors
+    // ✅ Get all donors
     public List<Donor> getAllDonors() {
         return donorDAO.getAllDonors();
     }
 
-    // Update donor — returns true if updated (assumes donorDAO.updateDonor returns
-    // boolean)
+    // ✅ Update donor
     public boolean updateDonor(int id, String phone, String city) {
         return donorDAO.updateDonor(id, phone, city);
     }
 
-    // Delete donor — returns true if deleted (assumes donorDAO.deleteDonor returns
-    // boolean)
+    // ✅ Delete donor
     public boolean deleteDonor(int id) {
         return donorDAO.deleteDonor(id);
     }
 
-    public Object search(String string, String string2) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'search'");
+    // ✅ Search donors (merged from your version)
+    public List<Donor> searchDonors(String bloodGroup, String city) {
+        return donorDAO.searchDonors(bloodGroup, city);
     }
 }
