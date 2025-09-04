@@ -12,6 +12,7 @@ public class Donor {
     private String city;
     private LocalDate lastDonationDate;
 
+<<<<<<< HEAD
     // ✅ No-args constructor (needed by frameworks / DB mapping)
     public Donor() {
     }
@@ -20,6 +21,10 @@ public class Donor {
     public Donor(int id, String name, int age, String gender, String bloodGroup,
             String phone, String city, LocalDate lastDonationDate) {
         this.id = id;
+=======
+
+     public Donor(String name, int age, String gender, String bloodGroup, String phone, String city, LocalDate lastDonationDate) {
+>>>>>>> origin/main
         this.name = name;
         this.age = age;
         this.gender = gender;
@@ -29,6 +34,7 @@ public class Donor {
         this.lastDonationDate = lastDonationDate;
     }
 
+<<<<<<< HEAD
     // ✅ Constructor without id (useful for mock data or new entries)
     public Donor(String name, int age, String gender, String bloodGroup,
             String phone, String city, LocalDate lastDonationDate) {
@@ -112,5 +118,31 @@ public class Donor {
                 ", gender=" + gender + ", bloodGroup=" + bloodGroup +
                 ", phone=" + phone + ", city=" + city +
                 ", lastDonationDate=" + lastDonationDate + "]";
+=======
+    public Donor() { }
+
+    // Getters and Setters
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public int getAge() { return age; }
+    public void setAge(int age) { this.age = age; }
+    public String getGender() { return gender; }
+    public void setGender(String gender) { this.gender = gender; }
+    public String getBloodGroup() { return bloodGroup; }
+    public void setBloodGroup(String bloodGroup) { this.bloodGroup = bloodGroup; }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
+    public String getCity() { return city; }
+    public void setCity(String city) { this.city = city; }
+    public LocalDate getLastDonationDate() { return lastDonationDate; }
+    public void setLastDonationDate(LocalDate lastDonationDate) { this.lastDonationDate = lastDonationDate; }
+
+    @Override
+    public String toString() {
+        return id + " | " + name + " | " + age + " | " + gender + " | " +
+               bloodGroup + " | " + phone + " | " + city + " | Last Donation: " + lastDonationDate;
+>>>>>>> origin/main
     }
 }

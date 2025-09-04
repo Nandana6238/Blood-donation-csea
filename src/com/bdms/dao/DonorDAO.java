@@ -4,6 +4,7 @@ import com.bdms.model.Donor;
 import com.bdms.util.DBConnection;
 
 import java.sql.*;
+<<<<<<< HEAD
 import java.time.LocalDate;
 import java.util.*;
 import java.sql.Date;
@@ -91,15 +92,27 @@ public class DonorDAO {
         }
     }
 
+=======
+import java.util.ArrayList;
+import java.util.List;
+
+public class DonorDAO {
+>>>>>>> origin/main
     public List<Donor> getAllDonors() {
         if (useMock) {
             return new ArrayList<>(mockDonors);
         }
         List<Donor> donors = new ArrayList<>();
         String sql = "SELECT * FROM donors";
+
         try (Connection conn = DBConnection.getConnection();
+<<<<<<< HEAD
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {
+=======
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+>>>>>>> origin/main
 
             while (rs.next()) {
                 Donor donor = new Donor();
@@ -110,10 +123,17 @@ public class DonorDAO {
                 donor.setBloodGroup(rs.getString("blood_group"));
                 donor.setPhone(rs.getString("phone"));
                 donor.setCity(rs.getString("city"));
+<<<<<<< HEAD
                 donor.setLastDonationDate(rs.getDate("last_donation_date") != null
                         ? rs.getDate("last_donation_date").toLocalDate()
                         : null);
 
+=======
+                donor.setLastDonationDate(
+                    rs.getDate("last_donation_date") != null ?
+                    rs.getDate("last_donation_date").toLocalDate() : null
+                );
+>>>>>>> origin/main
                 donors.add(donor);
             }
         } catch (SQLException e) {
@@ -121,6 +141,7 @@ public class DonorDAO {
         }
         return donors;
     }
+<<<<<<< HEAD
 
     public boolean updateDonor(int id, String phone, String city) {
         if (useMock) {
@@ -163,3 +184,6 @@ public class DonorDAO {
         }
     }
 }
+=======
+}
+>>>>>>> origin/main
