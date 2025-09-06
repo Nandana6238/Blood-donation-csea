@@ -8,7 +8,11 @@ public class DonorService {
     private final DonorDAO donorDAO;
 
     public DonorService() {
-        this.donorDAO = new DonorDAO();
+        this.donorDAO = new DonorDAO(); // default mock
+    }
+
+    public DonorService(boolean useMock) {
+        this.donorDAO = new DonorDAO(useMock);
     }
 
     public void addDonor(Donor donor) {
