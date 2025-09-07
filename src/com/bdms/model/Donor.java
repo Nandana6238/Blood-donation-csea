@@ -13,12 +13,11 @@ public class Donor {
     private LocalDate lastDonationDate;
 
     // Default constructor
-    public Donor() {
-    }
+    public Donor() { }
 
-    // Constructor with all fields
+    // Constructor with all fields (including ID)
     public Donor(int id, String name, int age, String gender, String bloodGroup,
-            String phone, String city, LocalDate lastDonationDate) {
+                 String phone, String city, LocalDate lastDonationDate) {
         this.id = id;
         this.name = name;
         this.age = age;
@@ -29,9 +28,9 @@ public class Donor {
         this.lastDonationDate = lastDonationDate;
     }
 
-    // Constructor without id (for mock/new donors)
+    // Constructor without ID (for new donors before saving to DB)
     public Donor(String name, int age, String gender, String bloodGroup,
-            String phone, String city, LocalDate lastDonationDate) {
+                 String phone, String city, LocalDate lastDonationDate) {
         this.name = name;
         this.age = age;
         this.gender = gender;
@@ -42,75 +41,35 @@ public class Donor {
     }
 
     // Getters and setters
-    public int getId() {
-        return id;
-    }
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public String getName() {
-        return name;
-    }
+    public int getAge() { return age; }
+    public void setAge(int age) { this.age = age; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public String getGender() { return gender; }
+    public void setGender(String gender) { this.gender = gender; }
 
-    public int getAge() {
-        return age;
-    }
+    public String getBloodGroup() { return bloodGroup; }
+    public void setBloodGroup(String bloodGroup) { this.bloodGroup = bloodGroup; }
 
-    public void setAge(int age) {
-        this.age = age;
-    }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
 
-    public String getGender() {
-        return gender;
-    }
+    public String getCity() { return city; }
+    public void setCity(String city) { this.city = city; }
 
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    public String getBloodGroup() {
-        return bloodGroup;
-    }
-
-    public void setBloodGroup(String bloodGroup) {
-        this.bloodGroup = bloodGroup;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public LocalDate getLastDonationDate() {
-        return lastDonationDate;
-    }
-
-    public void setLastDonationDate(LocalDate lastDonationDate) {
-        this.lastDonationDate = lastDonationDate;
-    }
+    public LocalDate getLastDonationDate() { return lastDonationDate; }
+    public void setLastDonationDate(LocalDate lastDonationDate) { this.lastDonationDate = lastDonationDate; }
 
     @Override
     public String toString() {
-        return "Donor [id=" + id + ", name=" + name + ", age=" + age +
-                ", gender=" + gender + ", bloodGroup=" + bloodGroup +
-                ", phone=" + phone + ", city=" + city +
-                ", lastDonationDate=" + lastDonationDate + "]";
+        return "Donor [ID=" + id + ", Name=" + name + ", Age=" + age +
+               ", Gender=" + gender + ", BloodGroup=" + bloodGroup +
+               ", Phone=" + phone + ", City=" + city +
+               ", LastDonationDate=" + lastDonationDate + "]";
     }
 }

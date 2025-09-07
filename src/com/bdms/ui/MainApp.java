@@ -2,6 +2,7 @@
 package com.bdms.ui;
 
 import com.bdms.model.Donor;
+import com.bdms.model.Request;
 import com.bdms.service.DonorService;
 import java.time.LocalDate;
 import java.util.List;
@@ -110,22 +111,30 @@ public class MainApp {
                     }); 
                     break;
                 case "9": // Record a Donation 
-                    System.out.print("Enter Donor ID: "); 
-                    int dId = sc.nextInt(); sc.nextLine(); 
-                    System.out.print("Enter Donation Date (YYYY-MM-DD): "); 
-                    String dateStr = sc.nextLine(); 
-                    LocalDate dDate = LocalDate.parse(dateStr); 
-                    System.out.print("Enter Volume (ml): "); 
-                    int volume = sc.nextInt(); sc.nextLine(); 
- 
-                    donationService.addDonation(new Donation(dId, dDate, volume)); 
-                    System.out.println(" Donation recorded successfully!"); 
+                     try {
+                            System.out.print("Enter Donor ID: ");
+                            int donorId = Integer.parseInt(sc.nextLine());
+                            System.out.print("Enter Donation Date (YYYY-MM-DD): ");
+                            LocalDate date = LocalDate.parse(sc.nextLine());
+                            System.out.print("Enter Volume (ml): ");
+                            int volume = Integer.parseInt(sc.nextLine());
+                            donationService.recordDonation(donorId, date, volume);
+                    } catch (Exception e) {
+                        System.out.println("⚠ Invalid input! " + e.getMessage());
+                    }
                     break;
                 case "10": // View Donation History 
-                    System.out.print("Enter Donor ID: "); 
-                    int donorId = sc.nextInt(); sc.nextLine(); 
-                    donationService.getDonationHistory(donorId).forEach(System.out::println); 
-                    break; 
+                   try {
+                        System.out.print("Enter Donor ID: ");
+                        int donorId = Integer.parseInt(sc.nextLine());
+                        donationService.showDonationHistory(donorId);
+                        } catch (Exception e) {
+                        System.out.println("⚠ Invalid input!");
+                        }
+                        break;
+                case "11": // View All Donations 
+                    donationService.showAllDonations();
+                    break;
                 case "0":
                     System.out.println("Exiting... Goodbye!");
                     System.exit(0);
@@ -173,9 +182,23 @@ public class MainApp {
         Donor donor = new Donor(name, age, gender, bloodGroup, phone, city, LocalDate.now());
         donorService.addDonor(donor);
         System.out.println("✅ Donor registered successfully!");
+        } 
+
+     private static void searchDonorUI() {
+        System.out.print("Enter Donor Name: ");
+        String name = sc.nextLine();
+        List<Donor> donors = donorService.searchDonors(name);
+        donors.forEach(System.out::println);
     }
+
+     private static void viewAllDonorsUI() {
+        List<Donor> donors = donorService.getAllDonors();
+        donors.forEach(System.out::println);
+    }
+    
+
     private static void donorTestApp(){
-        system.out.println("\n===Donor Test App===");
+        System.out.println("\n===Donor Test App===");
         List<Donor>donors=donorService.getAllDonor();
         for (Donor d:donors){
             System.out.println(d);
