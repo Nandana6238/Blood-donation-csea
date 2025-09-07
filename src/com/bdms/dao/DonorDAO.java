@@ -4,77 +4,63 @@ import com.bdms.model.Donor;
 import com.bdms.util.DBConnection;
 
 import java.sql.*;
-import java.sql.Date;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class DonorDAO {
     private static final List<Donor> mockDonors = new ArrayList<>();
-    private boolean useMock = true; // default mock mode for Week 2
+    private boolean mockMode = true; // default mock
 
-    // Constructors
-    public DonorDAO() {
+    // Constructor
+    public DonorDAO(boolean mockMode) {
+        this.mockMode = mockMode;
+
+        if (mockMode && mockDonors.isEmpty()) {
+            // preload sample donors
+            mockDonors.add(new Donor(0, "Aisha Khan", 24, "F", "A+", "9876543210", "Delhi", LocalDate.of(2025, 5, 1)));
+            mockDonors.add(new Donor(0, "Rahul Nair", 29, "M", "O+", "9876501234", "Kochi", LocalDate.of(2025, 7, 10)));
+            mockDonors.add(new Donor(0, "Devika P", 32, "F", "A+", "9998887776", "Delhi", null));
+            mockDonors
+                    .add(new Donor(0, "Arun Kumar", 41, "M", "B-", "9123456789", "Chennai", LocalDate.of(2025, 8, 10)));
+        }
     }
 
-    public DonorDAO(boolean useMock) {
-        this.useMock = useMock;
-    }
-
-    public void setUseMock(boolean useMock) {
-        this.useMock = useMock;
-    }
-
-    static {
-        mockDonors.add(new Donor("Aisha Khan", 24, "F", "A+", "9876543210", "Delhi", LocalDate.of(2025, 5, 1)));
-        mockDonors.add(new Donor("Rahul Nair", 29, "M", "O+", "9876501234", "Kochi", LocalDate.of(2025, 7, 10)));
-        mockDonors.add(new Donor("Devika P", 32, "F", "A+", "9998887776", "Delhi", null));
-        mockDonors.add(new Donor("Arun Kumar", 41, "M", "B-", "9123456789", "Chennai", LocalDate.of(2025, 8, 10)));
-    }
-
-    // Search donors
+    // 1. Search Donors
     public List<Donor> searchDonors(String bloodGroup, String city) {
-        if (useMock) {
+        if (mockMode) {
             return mockDonors.stream()
                     .filter(d -> d.getBloodGroup().equalsIgnoreCase(bloodGroup)
                             && d.getCity().equalsIgnoreCase(city))
                     .collect(Collectors.toList());
-        } else {
-            List<Donor> donors = new ArrayList<>();
-            String sql = "SELECT * FROM donors WHERE blood_group=? AND city=?";
-            try (Connection conn = DBConnection.getConnection();
-                    PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setString(1, bloodGroup);
-                ps.setString(2, city);
-                try (ResultSet rs = ps.executeQuery()) {
-                    while (rs.next()) {
-                        Donor donor = new Donor();
-                        donor.setId(rs.getInt("id"));
-                        donor.setName(rs.getString("name"));
-                        donor.setAge(rs.getInt("age"));
-                        donor.setGender(rs.getString("gender"));
-                        donor.setBloodGroup(rs.getString("blood_group"));
-                        donor.setPhone(rs.getString("phone"));
-                        donor.setCity(rs.getString("city"));
-                        donor.setLastDonationDate(rs.getDate("last_donation_date") != null
-                                ? rs.getDate("last_donation_date").toLocalDate()
-                                : null);
-                        donors.add(donor);
-                    }
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            return donors;
         }
+
+        List<Donor> donors = new ArrayList<>();
+        String sql = "SELECT * FROM donors WHERE blood_group=? AND city=?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, bloodGroup);
+            ps.setString(2, city);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Donor donor = mapResultSet(rs);
+                donors.add(donor);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return donors;
     }
 
-    // Add donor
+    // 2. Add Donor
     public void addDonor(Donor donor) {
-        if (useMock) {
+        if (mockMode) {
+            donor.setId(mockDonors.size() + 1);
             mockDonors.add(donor);
             return;
         }
+
         String sql = "INSERT INTO donors(name, age, gender, blood_group, phone, city, last_donation_date) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -87,7 +73,7 @@ public class DonorDAO {
             if (donor.getLastDonationDate() != null) {
                 ps.setDate(7, Date.valueOf(donor.getLastDonationDate()));
             } else {
-                ps.setNull(7, java.sql.Types.DATE);
+                ps.setNull(7, Types.DATE);
             }
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -95,9 +81,9 @@ public class DonorDAO {
         }
     }
 
-    // Get all donors
+    // 3. Get All Donors
     public List<Donor> getAllDonors() {
-        if (useMock)
+        if (mockMode)
             return new ArrayList<>(mockDonors);
 
         List<Donor> donors = new ArrayList<>();
@@ -106,18 +92,7 @@ public class DonorDAO {
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                Donor donor = new Donor();
-                donor.setId(rs.getInt("id"));
-                donor.setName(rs.getString("name"));
-                donor.setAge(rs.getInt("age"));
-                donor.setGender(rs.getString("gender"));
-                donor.setBloodGroup(rs.getString("blood_group"));
-                donor.setPhone(rs.getString("phone"));
-                donor.setCity(rs.getString("city"));
-                donor.setLastDonationDate(rs.getDate("last_donation_date") != null
-                        ? rs.getDate("last_donation_date").toLocalDate()
-                        : null);
-                donors.add(donor);
+                donors.add(mapResultSet(rs));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -125,9 +100,9 @@ public class DonorDAO {
         return donors;
     }
 
-    // Update donor
+    // 4. Update Donor
     public boolean updateDonor(int id, String phone, String city) {
-        if (useMock) {
+        if (mockMode) {
             for (Donor d : mockDonors) {
                 if (d.getId() == id) {
                     d.setPhone(phone);
@@ -137,6 +112,7 @@ public class DonorDAO {
             }
             return false;
         }
+
         String sql = "UPDATE donors SET phone=?, city=? WHERE id=?";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -150,11 +126,12 @@ public class DonorDAO {
         }
     }
 
-    // Delete donor
+    // 5. Delete Donor
     public boolean deleteDonor(int id) {
-        if (useMock) {
+        if (mockMode) {
             return mockDonors.removeIf(d -> d.getId() == id);
         }
+
         String sql = "DELETE FROM donors WHERE id=?";
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -164,5 +141,22 @@ public class DonorDAO {
             e.printStackTrace();
             return false;
         }
+    }
+
+    // Helper: map ResultSet -> Donor
+    private Donor mapResultSet(ResultSet rs) throws SQLException {
+        Donor donor = new Donor();
+        donor.setId(rs.getInt("id"));
+        donor.setName(rs.getString("name"));
+        donor.setAge(rs.getInt("age"));
+        donor.setGender(rs.getString("gender"));
+        donor.setBloodGroup(rs.getString("blood_group"));
+        donor.setPhone(rs.getString("phone"));
+        donor.setCity(rs.getString("city"));
+        donor.setLastDonationDate(
+                rs.getDate("last_donation_date") != null
+                        ? rs.getDate("last_donation_date").toLocalDate()
+                        : null);
+        return donor;
     }
 }

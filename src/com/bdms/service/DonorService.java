@@ -2,13 +2,18 @@ package com.bdms.service;
 
 import com.bdms.dao.DonorDAO;
 import com.bdms.model.Donor;
+
 import java.util.List;
 
 public class DonorService {
-    private final DonorDAO donorDAO;
+    private DonorDAO donorDAO;
 
-    public DonorService() {
-        this.donorDAO = new DonorDAO();
+    public DonorService(boolean mockMode) {
+        this.donorDAO = new DonorDAO(mockMode);
+    }
+
+    public List<Donor> searchDonors(String bloodGroup, String city) {
+        return donorDAO.searchDonors(bloodGroup, city);
     }
 
     public void addDonor(Donor donor) {
@@ -25,9 +30,5 @@ public class DonorService {
 
     public boolean deleteDonor(int id) {
         return donorDAO.deleteDonor(id);
-    }
-
-    public List<Donor> searchDonors(String bloodGroup, String city) {
-        return donorDAO.searchDonors(bloodGroup, city);
     }
 }
