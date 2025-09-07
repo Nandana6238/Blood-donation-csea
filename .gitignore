@@ -1,0 +1,11 @@
+# Ignore compiled class files
+.vscode/
+bin/
+*.class
+
+# Old folder, don’t track
+BDMS/
+
+# Ignore only test folder,not whole src
+src/com/bdms/test/
+

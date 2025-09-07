@@ -23,6 +23,20 @@ public class Donor {
         this.lastDonationDate = lastDonationDate;
     }
 
+
+    // Constructor with ID (for retrieving from DB)
+    public Donor(int id, String name, int age, String gender, String bloodGroup, String phone, String city, LocalDate lastDonationDate) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+        this.bloodGroup = bloodGroup;
+        this.phone = phone;
+        this.city = city;
+        this.lastDonationDate = lastDonationDate;
+    }
+
+
     public Donor() { }
 
     // Getters and Setters
@@ -43,9 +57,11 @@ public class Donor {
     public LocalDate getLastDonationDate() { return lastDonationDate; }
     public void setLastDonationDate(LocalDate lastDonationDate) { this.lastDonationDate = lastDonationDate; }
 
-    @Override
+ @Override
     public String toString() {
-        return id + " | " + name + " | " + age + " | " + gender + " | " +
-               bloodGroup + " | " + phone + " | " + city + " | Last Donation: " + lastDonationDate;
+        return "Donor [ID=" + id + ", Name=" + name + ", Age=" + age +
+               ", Gender=" + gender + ", BloodGroup=" + bloodGroup +
+               ", Phone=" + phone + ", City=" + city +
+               ", LastDonationDate=" + lastDonationDate + "]";
     }
 }
