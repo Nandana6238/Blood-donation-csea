@@ -31,6 +31,13 @@ public class DonorDAO {
         mockDonors.add(new Donor("Rahul Nair", 29, "M", "O+", "9876501234", "Kochi", LocalDate.of(2025, 7, 10)));
         mockDonors.add(new Donor("Devika P", 32, "F", "A+", "9998887776", "Delhi", null));
         mockDonors.add(new Donor("Arun Kumar", 41, "M", "B-", "9123456789", "Chennai", LocalDate.of(2025, 8, 10)));
+
+        // Assign IDs to preloaded donors
+        int idCounter = 1;
+        for (Donor d : mockDonors) {
+            d.setId(idCounter++);
+        }
+        nextId = idCounter; // continue auto-increment from here
     }
 
     // Search donors
