@@ -11,7 +11,19 @@ import java.util.stream.Collectors;
 
 public class DonorDAO {
     private static final List<Donor> mockDonors = new ArrayList<>();
-    private boolean useMock = true; // true = mock, false = DB
+    private boolean useMock = true; // default mock mode for Week 2
+
+    // Constructors
+    public DonorDAO() {
+    }
+
+    public DonorDAO(boolean useMock) {
+        this.useMock = useMock;
+    }
+
+    public void setUseMock(boolean useMock) {
+        this.useMock = useMock;
+    }
 
     static {
         mockDonors.add(new Donor("Aisha Khan", 24, "F", "A+", "9876543210", "Delhi", LocalDate.of(2025, 5, 1)));
@@ -20,6 +32,7 @@ public class DonorDAO {
         mockDonors.add(new Donor("Arun Kumar", 41, "M", "B-", "9123456789", "Chennai", LocalDate.of(2025, 8, 10)));
     }
 
+    // Search donors
     public List<Donor> searchDonors(String bloodGroup, String city) {
         if (useMock) {
             return mockDonors.stream()
@@ -56,6 +69,7 @@ public class DonorDAO {
         }
     }
 
+    // Add donor
     public void addDonor(Donor donor) {
         if (useMock) {
             mockDonors.add(donor);
@@ -81,6 +95,7 @@ public class DonorDAO {
         }
     }
 
+    // Get all donors
     public List<Donor> getAllDonors() {
         if (useMock)
             return new ArrayList<>(mockDonors);
@@ -110,6 +125,7 @@ public class DonorDAO {
         return donors;
     }
 
+    // Update donor
     public boolean updateDonor(int id, String phone, String city) {
         if (useMock) {
             for (Donor d : mockDonors) {
@@ -134,6 +150,7 @@ public class DonorDAO {
         }
     }
 
+    // Delete donor
     public boolean deleteDonor(int id) {
         if (useMock) {
             return mockDonors.removeIf(d -> d.getId() == id);
