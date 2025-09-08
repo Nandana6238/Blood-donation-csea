@@ -6,10 +6,10 @@ import com.bdms.model.Donor;
 import java.util.List;
 
 public class DonorService {
-    private DonorDAO donorDAO;
+    private final DonorDAO donorDAO;
 
-    public DonorService(boolean mockMode) {
-        this.donorDAO = new DonorDAO(mockMode);
+    public DonorService(boolean useMock) {
+        this.donorDAO = new DonorDAO(useMock);
     }
 
     public List<Donor> searchDonors(String bloodGroup, String city) {
@@ -22,13 +22,5 @@ public class DonorService {
 
     public List<Donor> getAllDonors() {
         return donorDAO.getAllDonors();
-    }
-
-    public boolean updateDonor(int id, String phone, String city) {
-        return donorDAO.updateDonor(id, phone, city);
-    }
-
-    public boolean deleteDonor(int id) {
-        return donorDAO.deleteDonor(id);
     }
 }
