@@ -1,24 +1,8 @@
 # Ignore compiled class files
 *.class
 
-# Ignore build / output directories
+# Ignore bin
 /bin/
-/out/
-/target/
-
-# Ignore logs
-*.log
-
 # Ignore VS Code settings
 .vscode/
 
-# Ignore OS-specific files
-.DS_Store
-Thumbs.db
-
-# Ignore IntelliJ / Eclipse configs (if anyone uses them)
-.idea/
-*.iml
-.project
-.classpath
-.settings/
