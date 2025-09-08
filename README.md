@@ -40,24 +40,13 @@ A Java-based console application to register, manage, and search for blood donor
 
 ## 🗂️ Project Structure
 
-```bash
+
 BloodDonorManagement/
 ├── Donor.java              # Donor entity class
 ├── DatabaseHandler.java    # DB operations using JDBC
 ├── BloodDonorApp.java      # Main application (menu-driven)
 ├── README.md               # Project summary (this file)
 └── blood_donor_db.db       # SQLite DB file (or schema.sql for MySQL)
-
-
-```bash
-BloodDonorManagement/
-├── Donor.java              # Donor entity class
-├── DatabaseHandler.java    # DB operations using JDBC
-├── BloodDonorApp.java      # Main application (menu-driven)
-├── README.md               # Project summary (this file)
-└── blood_donor_db.db       # SQLite DB file (or schema.sql for MySQL)
-
-
 
 
 # Blood Donor Management System - Database Setup
@@ -70,7 +59,7 @@ BloodDonorManagement/
 ## Database Setup
 1. Open MySQL command line or MySQL Workbench.
 2. Run the following commands:
-```sql
+sql
 CREATE DATABASE IF NOT EXISTS bdms;
 USE bdms;
 CREATE TABLE IF NOT EXISTS donors (
