@@ -1,8 +1,13 @@
 # Ignore compiled class files
 *.class
 
-# Ignore bin
+# Ignore bin directory
 /bin/
-# Ignore VS Code settings
-.vscode/
+
+# Ignore log files
+*.log
+
+# Ignore system files
+.DS_Store
+Thumbs.db
 
