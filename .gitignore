@@ -1,10 +1,24 @@
 # Ignore compiled class files
-.vscode/
-bin/
 *.class
 
-# Old folder, don’t track
-BDMS/
+# Ignore build / output directories
+/bin/
+/out/
+/target/
 
-# Ignore only test folder,not whole src
-src/com/bdms/test/
+# Ignore logs
+*.log
+
+# Ignore VS Code settings
+.vscode/
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore IntelliJ / Eclipse configs (if anyone uses them)
+.idea/
+*.iml
+.project
+.classpath
+.settings/
