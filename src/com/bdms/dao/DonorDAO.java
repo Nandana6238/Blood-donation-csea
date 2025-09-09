@@ -20,11 +20,11 @@ public class DonorDAO {
 
         if (mockMode && mockDonors.isEmpty()) {
             // preload sample donors
-            mockDonors.add(new Donor(0, "Aisha Khan", 24, "F", "A+", "9876543210", "Delhi", LocalDate.of(2025, 5, 1)));
-            mockDonors.add(new Donor(0, "Rahul Nair", 29, "M", "O+", "9876501234", "Kochi", LocalDate.of(2025, 7, 10)));
-            mockDonors.add(new Donor(0, "Devika P", 32, "F", "A+", "9998887776", "Delhi", null));
+            mockDonors.add(new Donor(1, "Aisha Khan", 24, "F", "A+", "9876543210", "Delhi", LocalDate.of(2025, 5, 1)));
+            mockDonors.add(new Donor(2, "Rahul Nair", 29, "M", "O+", "9876501234", "Kochi", LocalDate.of(2025, 7, 10)));
+            mockDonors.add(new Donor(3, "Devika P", 32, "F", "A+", "9998887776", "Delhi", null));
             mockDonors
-                    .add(new Donor(0, "Arun Kumar", 41, "M", "B-", "9123456789", "Chennai", LocalDate.of(2025, 8, 10)));
+                    .add(new Donor(4, "Arun Kumar", 41, "M", "B-", "9123456789", "Chennai", LocalDate.of(2025, 8, 10)));
         }
     }
 
