@@ -26,11 +26,12 @@ public class MenuApp {
             System.out.println("\n=== MENU (" + (mockMode ? "MOCK" : "DB") + ") ===");
             System.out.println("1. Add Donor");
             System.out.println("2. View All Donors");
-            System.out.println("3. Search Donors");
+            System.out.println("3. Search Donors (BloodGroup + City)");
             System.out.println("4. Update Donor");
             System.out.println("5. Delete Donor");
             System.out.println("6. Find Donor by Phone");
-            System.out.println("7. Exit");
+            System.out.println("7. Reports");
+            System.out.println("8. Exit");
             int option = readInt(sc, "Enter choice: ");
 
             switch (option) {
@@ -40,7 +41,8 @@ public class MenuApp {
                 case 4 -> updateDonorFlow(sc, service);
                 case 5 -> deleteDonorFlow(sc, service);
                 case 6 -> findByPhoneFlow(sc, service);
-                case 7 -> {
+                case 7 -> reportsFlow(sc, service);
+                case 8 -> {
                     System.out.println("👋 Goodbye!");
                     sc.close();
                     return;
@@ -50,7 +52,101 @@ public class MenuApp {
         }
     }
 
-    // ---------------- Flows ----------------
+    // ---------------- Reports ----------------
+
+    private static void reportsFlow(Scanner sc, DonorService service) {
+        System.out.println("--- Reports ---");
+        System.out.println("1. Donors by City");
+        System.out.println("2. Donors by Blood Group");
+        System.out.println("3. Eligible Donors (not donated in last N months)");
+        System.out.println("4. Export report to CSV");
+        System.out.println("5. Back");
+
+        int r = readInt(sc, "Choose report: ");
+        List<Donor> lastReport = null;
+
+        switch (r) {
+            case 1 -> {
+                String city = readString(sc, "Enter City: ");
+                lastReport = service.getDonorsByCity(city);
+                printDonorTable(lastReport);
+            }
+            case 2 -> {
+                String bg = readString(sc, "Enter Blood Group: ").toUpperCase();
+                if (!isValidBloodGroup(bg)) {
+                    System.out.println("❌ Invalid blood group.");
+                    return;
+                }
+                lastReport = service.getDonorsByBloodGroup(bg);
+                printDonorTable(lastReport);
+            }
+            case 3 -> {
+                int months = readInt(sc, "Enter minimum months since last donation: ");
+                lastReport = service.getEligibleDonors(months);
+                printDonorTable(lastReport);
+            }
+            case 4 -> {
+                String filename = readString(sc, "Enter filename (e.g., report.csv): ");
+                int ex = readInt(sc, "Export which report? 1=City 2=BloodGroup 3=Eligible: ");
+                if (ex == 1) {
+                    String city = readString(sc, "Enter City: ");
+                    lastReport = service.getDonorsByCity(city);
+                } else if (ex == 2) {
+                    String bg = readString(sc, "Enter Blood Group: ").toUpperCase();
+                    lastReport = service.getDonorsByBloodGroup(bg);
+                } else if (ex == 3) {
+                    int months = readInt(sc, "Enter minimum months: ");
+                    lastReport = service.getEligibleDonors(months);
+                }
+                if (lastReport != null) {
+                    boolean ok = writeCsv(lastReport, filename);
+                    System.out.println(ok ? "✅ CSV written: " + filename : "❌ Failed to write CSV.");
+                }
+            }
+            case 5 -> {
+                return; // back
+            }
+            default -> System.out.println("❌ Invalid report choice.");
+        }
+    }
+
+    private static void printDonorTable(List<Donor> donors) {
+        if (donors == null || donors.isEmpty()) {
+            System.out.println("No donors found.");
+            return;
+        }
+        System.out.printf("%-4s %-20s %-4s %-6s %-8s %-12s %-12s %-12s%n",
+                "ID", "Name", "Age", "Gender", "BGroup", "Phone", "City", "LastDonation");
+        System.out.println("--------------------------------------------------------------------------------");
+        for (Donor d : donors) {
+            String dateStr = d.getLastDonationDate() == null ? "N/A" : d.getLastDonationDate().toString();
+            System.out.printf("%-4d %-20s %-4d %-6s %-8s %-12s %-12s %-12s%n",
+                    d.getId(), d.getName(), d.getAge(), d.getGender(),
+                    d.getBloodGroup(), d.getPhone(), d.getCity(), dateStr);
+        }
+    }
+
+    private static boolean writeCsv(List<Donor> donors, String filename) {
+        try (java.io.PrintWriter pw = new java.io.PrintWriter(filename)) {
+            pw.println("id,name,age,gender,blood_group,phone,city,last_donation_date");
+            for (Donor d : donors) {
+                String date = d.getLastDonationDate() == null ? "" : d.getLastDonationDate().toString();
+                String name = d.getName().replace(",", " "); // prevent CSV break
+                String city = (d.getCity() == null ? "" : d.getCity().replace(",", " "));
+                pw.printf("%d,%s,%d,%s,%s,%s,%s,%s%n",
+                        d.getId(), name, d.getAge(), d.getGender(),
+                        d.getBloodGroup(), d.getPhone(), city, date);
+            }
+            return true;
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // ---------------- Other Flows ----------------
+    // (unchanged: addDonorFlow, viewAllDonors, searchDonorsFlow, updateDonorFlow,
+    // deleteDonorFlow, findByPhoneFlow)
 
     private static void addDonorFlow(Scanner sc, DonorService service) {
         System.out.println("--- Add Donor ---");
@@ -61,21 +157,17 @@ public class MenuApp {
             return;
         }
         String gender = readString(sc, "Enter Gender (M/F): ");
-
         String bloodGroup = readString(sc, "Enter Blood Group: ").toUpperCase();
         if (!isValidBloodGroup(bloodGroup)) {
             System.out.println("❌ Invalid blood group.");
             return;
         }
-
         String phone = readString(sc, "Enter Phone (10 digits): ");
         if (!isValidPhone(phone)) {
             System.out.println("❌ Invalid phone number.");
             return;
         }
-
         String city = readString(sc, "Enter City: ");
-
         String dateStr = readString(sc, "Enter Last Donation Date (YYYY-MM-DD or blank): ");
         LocalDate lastDonationDate = null;
         if (!dateStr.isBlank()) {
@@ -93,11 +185,7 @@ public class MenuApp {
         } else {
             Donor donor = new Donor(0, name, age, gender, bloodGroup, phone, city, lastDonationDate);
             boolean added = service.addDonor(donor);
-            if (added) {
-                System.out.println("✅ Donor added successfully!");
-            } else {
-                System.out.println("❌ Donor not added. Please check details.");
-            }
+            System.out.println(added ? "✅ Donor added successfully!" : "❌ Donor not added.");
         }
     }
 
@@ -147,11 +235,7 @@ public class MenuApp {
         System.out.println("--- Find Donor by Phone ---");
         String searchPhone = readString(sc, "Enter Phone Number: ");
         Donor d = service.findByPhone(searchPhone);
-        if (d != null) {
-            System.out.println("✅ Donor found: " + d);
-        } else {
-            System.out.println("❌ No donor found with this phone.");
-        }
+        System.out.println(d != null ? "✅ Donor found: " + d : "❌ No donor found with this phone.");
     }
 
     // ---------------- Helpers ----------------

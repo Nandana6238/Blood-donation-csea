@@ -78,7 +78,7 @@ public class DonorDAO {
         }
     }
 
-    /** Search donors by blood group and city */
+    /** Search donors by blood group and city (combined) */
     public List<Donor> searchDonors(String bloodGroup, String city) {
         if (mockMode) {
             return mockDonors.stream()
@@ -186,8 +186,78 @@ public class DonorDAO {
         return null;
     }
 
-    // --- helper methods ---
+    // --- Week 5 Enhancements ---
 
+    /** Get donors by city */
+    public List<Donor> getDonorsByCity(String city) {
+        if (mockMode) {
+            return mockDonors.stream()
+                    .filter(d -> d.getCity() != null && d.getCity().equalsIgnoreCase(city))
+                    .collect(Collectors.toList());
+        }
+        List<Donor> list = new ArrayList<>();
+        String sql = "SELECT * FROM donors WHERE city = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, city);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next())
+                    list.add(mapResultSet(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    /** Get donors by blood group */
+    public List<Donor> getDonorsByBloodGroup(String bloodGroup) {
+        if (mockMode) {
+            return mockDonors.stream()
+                    .filter(d -> d.getBloodGroup() != null && d.getBloodGroup().equalsIgnoreCase(bloodGroup))
+                    .collect(Collectors.toList());
+        }
+        List<Donor> list = new ArrayList<>();
+        String sql = "SELECT * FROM donors WHERE blood_group = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, bloodGroup);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next())
+                    list.add(mapResultSet(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    /** Get eligible donors (last donation older than 'months' or never donated) */
+    public List<Donor> getEligibleDonors(int months) {
+        if (mockMode) {
+            final LocalDate cutoff = LocalDate.now().minusMonths(months);
+            return mockDonors.stream()
+                    .filter(d -> d.getLastDonationDate() == null
+                            || d.getLastDonationDate().isBefore(cutoff)
+                            || d.getLastDonationDate().isEqual(cutoff))
+                    .collect(Collectors.toList());
+        }
+        List<Donor> list = new ArrayList<>();
+        String sql = "SELECT * FROM donors WHERE last_donation_date IS NULL OR last_donation_date <= DATE_SUB(CURDATE(), INTERVAL ? MONTH)";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, months);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next())
+                    list.add(mapResultSet(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    // --- helper methods ---
     private Donor mapResultSet(ResultSet rs) throws SQLException {
         Donor donor = new Donor();
         donor.setId(rs.getInt("id"));
