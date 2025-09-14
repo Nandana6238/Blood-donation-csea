@@ -16,8 +16,9 @@ public class DonorService {
         return donorDAO.searchDonors(bloodGroup, city);
     }
 
-    public void addDonor(Donor donor) {
-        donorDAO.addDonor(donor);
+    // FIX: return boolean instead of void
+    public boolean addDonor(Donor donor) {
+        return donorDAO.addDonor(donor);
     }
 
     public List<Donor> getAllDonors() {
@@ -30,5 +31,9 @@ public class DonorService {
 
     public boolean deleteDonor(int id) {
         return donorDAO.deleteDonor(id);
+    }
+
+    public Donor findByPhone(String phone) {
+        return donorDAO.getDonorByPhone(phone);
     }
 }

@@ -1,4 +1,3 @@
-
 package com.bdms.dao;
 
 import com.bdms.model.Donor;
@@ -12,59 +11,46 @@ import java.util.stream.Collectors;
 
 public class DonorDAO {
     private static final List<Donor> mockDonors = new ArrayList<>();
-    private boolean mockMode = true; // default mock
+    private final boolean mockMode;
+    private static int mockIdCounter = 1;
 
-    // Constructor
+    static {
+        // initial mock data
+        mockDonors.add(new Donor(0, "Aisha Khan", 24, "F", "A+", "9876543210", "Delhi", LocalDate.of(2025, 5, 1)));
+        mockDonors.add(new Donor(0, "Rahul Nair", 29, "M", "O+", "9876501234", "Kochi", LocalDate.of(2025, 7, 10)));
+        mockDonors.add(new Donor(0, "Devika P", 32, "F", "A+", "9998887776", "Delhi", null));
+        mockDonors.add(new Donor(0, "Arun Kumar", 41, "M", "B-", "9123456789", "Chennai", LocalDate.of(2025, 8, 10)));
+    }
+
     public DonorDAO(boolean mockMode) {
         this.mockMode = mockMode;
-
-        if (mockMode && mockDonors.isEmpty()) {
-            // preload sample donors
-            mockDonors.add(new Donor(1, "Aisha Khan", 24, "F", "A+", "9876543210", "Delhi", LocalDate.of(2025, 5, 1)));
-            mockDonors.add(new Donor(2, "Rahul Nair", 29, "M", "O+", "9876501234", "Kochi", LocalDate.of(2025, 7, 10)));
-            mockDonors.add(new Donor(3, "Devika P", 32, "F", "A+", "9998887776", "Delhi", null));
-            mockDonors
-                    .add(new Donor(4, "Arun Kumar", 41, "M", "B-", "9123456789", "Chennai", LocalDate.of(2025, 8, 10)));
-        }
-    }
-
-    // 1. Search Donors
-    public List<Donor> searchDonors(String bloodGroup, String city) {
         if (mockMode) {
-            return mockDonors.stream()
-                    .filter(d -> d.getBloodGroup().equalsIgnoreCase(bloodGroup)
-                            && d.getCity().equalsIgnoreCase(city))
-                    .collect(Collectors.toList());
-        }
-
-        List<Donor> donors = new ArrayList<>();
-        String sql = "SELECT * FROM donors WHERE blood_group=? AND city=?";
-        try (Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, bloodGroup);
-            ps.setString(2, city);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Donor donor = mapResultSet(rs);
-                donors.add(donor);
+            for (Donor d : mockDonors) {
+                if (d.getId() == 0) {
+                    d.setId(mockIdCounter++);
+                }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
-        return donors;
     }
 
-    // 2. Add Donor
-    public void addDonor(Donor donor) {
+    /** Add donor, return true if success, false if duplicate or error */
+    public boolean addDonor(Donor donor) {
         if (mockMode) {
-            donor.setId(mockDonors.size() + 1);
+            if (existsByPhoneMock(donor.getPhone()))
+                return false;
+            donor.setId(mockIdCounter++);
             mockDonors.add(donor);
-            return;
+            return true;
         }
 
-        String sql = "INSERT INTO donors(name, age, gender, blood_group, phone, city, last_donation_date) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        // DB mode
+        if (existsByPhoneDB(donor.getPhone()))
+            return false;
+
+        String sql = "INSERT INTO donors(name, age, gender, blood_group, phone, city, last_donation_date) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, donor.getName());
             ps.setInt(2, donor.getAge());
             ps.setString(3, donor.getGender());
@@ -77,12 +63,47 @@ public class DonorDAO {
                 ps.setNull(7, Types.DATE);
             }
             ps.executeUpdate();
+
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next())
+                    donor.setId(rs.getInt(1));
+            }
+            return true;
+        } catch (SQLIntegrityConstraintViolationException e) {
+            // duplicate phone
+            return false;
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
     }
 
-    // 3. Get All Donors
+    /** Search donors by blood group and city */
+    public List<Donor> searchDonors(String bloodGroup, String city) {
+        if (mockMode) {
+            return mockDonors.stream()
+                    .filter(d -> d.getBloodGroup().equalsIgnoreCase(bloodGroup)
+                            && d.getCity().equalsIgnoreCase(city))
+                    .collect(Collectors.toList());
+        }
+
+        List<Donor> donors = new ArrayList<>();
+        String sql = "SELECT * FROM donors WHERE blood_group = ? AND city = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, bloodGroup);
+            ps.setString(2, city);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next())
+                    donors.add(mapResultSet(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return donors;
+    }
+
+    /** Get all donors */
     public List<Donor> getAllDonors() {
         if (mockMode)
             return new ArrayList<>(mockDonors);
@@ -92,16 +113,15 @@ public class DonorDAO {
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
+            while (rs.next())
                 donors.add(mapResultSet(rs));
-            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return donors;
     }
 
-    // 4. Update Donor
+    /** Update donor phone & city by ID */
     public boolean updateDonor(int id, String phone, String city) {
         if (mockMode) {
             for (Donor d : mockDonors) {
@@ -127,11 +147,10 @@ public class DonorDAO {
         }
     }
 
-    // 5. Delete Donor
+    /** Delete donor by ID */
     public boolean deleteDonor(int id) {
-        if (mockMode) {
+        if (mockMode)
             return mockDonors.removeIf(d -> d.getId() == id);
-        }
 
         String sql = "DELETE FROM donors WHERE id=?";
         try (Connection conn = DBConnection.getConnection();
@@ -144,7 +163,31 @@ public class DonorDAO {
         }
     }
 
-    // Helper: map ResultSet -> Donor
+    /** Find donor by phone */
+    public Donor getDonorByPhone(String phone) {
+        if (mockMode) {
+            return mockDonors.stream()
+                    .filter(d -> phone.equals(d.getPhone()))
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        String sql = "SELECT * FROM donors WHERE phone = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, phone);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next())
+                    return mapResultSet(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // --- helper methods ---
+
     private Donor mapResultSet(ResultSet rs) throws SQLException {
         Donor donor = new Donor();
         donor.setId(rs.getInt("id"));
@@ -159,5 +202,25 @@ public class DonorDAO {
                         ? rs.getDate("last_donation_date").toLocalDate()
                         : null);
         return donor;
+    }
+
+    private boolean existsByPhoneMock(String phone) {
+        return mockDonors.stream()
+                .anyMatch(d -> d.getPhone() != null && d.getPhone().equals(phone));
+    }
+
+    private boolean existsByPhoneDB(String phone) {
+        String sql = "SELECT COUNT(*) FROM donors WHERE phone = ?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, phone);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next())
+                    return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
