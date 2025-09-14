@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "TestReports",
+            "request": "launch",
+            "mainClass": "com.bdms.test.TestReports",
+            "projectName": "Blood-donation-csea_acacaa67"
+        },
+        {
+            "type": "java",
             "name": "TestDonorServiceNegative",
             "request": "launch",
             "mainClass": "com.bdms.test.TestDonorServiceNegative",
