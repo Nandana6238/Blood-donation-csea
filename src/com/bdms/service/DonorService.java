@@ -2,9 +2,7 @@ package com.bdms.service;
 
 import com.bdms.dao.DonorDAO;
 import com.bdms.model.Donor;
-
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public class DonorService {
@@ -15,9 +13,12 @@ public class DonorService {
     }
 
     public boolean isEligibleToDonate(Donor donor) {
-        LocalDate last = donor.getLastDonationDate();
-        if (last == null) return true;  // never donated before
-        long daysSince = ChronoUnit.DAYS.between(last, LocalDate.now());
-        return daysSince >= 90;
+        LocalDate lastDonation = donor.getLastDonationDate();
+
+        if (lastDonation == null) return true;
+
+        return lastDonation.plusMonths(3).isBefore(LocalDate.now()) ||
+               lastDonation.plusMonths(3).isEqual(LocalDate.now());
     }
 }
+
