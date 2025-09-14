@@ -1,7 +1,7 @@
 package com.bdms.dao;
 
 import com.bdms.model.Donor;
-import com.bdms.util.DBConnection;
+import com.bdms.ui.DBConnection;
 
 import java.sql.*;
 import java.util.ArrayList;

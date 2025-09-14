@@ -47,11 +47,18 @@ public class MainApp {
                 } 
                 break; 
                 case "2":
+
+                                                                               
+                  donorService.listAllDonors().forEach(d -> {
+                  boolean eligible = donorService.isEligibleToDonate(d);
+                  System.out.println(d + (eligible ? " ✅ Eligible" : " ❌ Not Eligible"));
+                   });
                     searchDonorUI();
                     break;
                 case "3":
                     viewAllDonorsUI();
                     break;
+                    
                 
                 case "4": // Update Donor 
                   try { 
