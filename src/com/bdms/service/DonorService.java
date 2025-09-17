@@ -4,6 +4,7 @@ import com.bdms.dao.DonorDAO;
 import com.bdms.model.Donor;
 
 import java.util.List;
+import java.util.Map;
 
 public class DonorService {
     private final DonorDAO donorDAO;
@@ -57,5 +58,22 @@ public class DonorService {
     /** Get eligible donors (who can donate after 'months') */
     public List<Donor> getEligibleDonors(int months) {
         return donorDAO.getEligibleDonors(months);
+    }
+
+    // === Week 6 Enhancements ===
+
+    /** Count donors grouped by blood group */
+    public Map<String, Integer> countDonorsByBloodGroup() {
+        return donorDAO.countDonorsByBloodGroup();
+    }
+
+    /** ✅ Count donors grouped by city and blood group */
+    public Map<String, Integer> countDonorsByCityAndBloodGroup() {
+        return donorDAO.countDonorsByCityAndBloodGroup();
+    }
+
+    /** Count eligible donors (efficient DB count) */
+    public int countEligibleDonors(int months) {
+        return donorDAO.countEligibleDonors(months);
     }
 }
