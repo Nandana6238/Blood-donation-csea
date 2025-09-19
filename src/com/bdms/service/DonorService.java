@@ -2,78 +2,72 @@ package com.bdms.service;
 
 import com.bdms.dao.DonorDAO;
 import com.bdms.model.Donor;
+import com.bdms.util.ImportResult;
 
 import java.util.List;
 import java.util.Map;
 
 public class DonorService {
-    private final DonorDAO donorDAO;
+    private final DonorDAO dao;
 
     public DonorService(boolean mockMode) {
-        this.donorDAO = new DonorDAO(mockMode);
+        this.dao = new DonorDAO(mockMode);
     }
 
-    /** Add donor (true if success, false if duplicate/error) */
+    // --- CRUD wrappers ---
+
     public boolean addDonor(Donor donor) {
-        return donorDAO.addDonor(donor);
+        return dao.addDonor(donor);
     }
 
-    /** Get all donors */
     public List<Donor> getAllDonors() {
-        return donorDAO.getAllDonors();
+        return dao.getAllDonors();
     }
 
-    /** Search donors by blood group + city */
     public List<Donor> searchDonors(String bloodGroup, String city) {
-        return donorDAO.searchDonors(bloodGroup, city);
+        return dao.searchDonors(bloodGroup, city);
     }
 
-    /** Update donor by ID (phone + city) */
     public boolean updateDonor(int id, String phone, String city) {
-        return donorDAO.updateDonor(id, phone, city);
+        return dao.updateDonor(id, phone, city);
     }
 
-    /** Delete donor by ID */
     public boolean deleteDonor(int id) {
-        return donorDAO.deleteDonor(id);
+        return dao.deleteDonor(id);
     }
 
-    /** Find donor by phone */
     public Donor findByPhone(String phone) {
-        return donorDAO.getDonorByPhone(phone);
+        return dao.getDonorByPhone(phone);
     }
 
-    // === Week 5 Enhancements ===
+    // --- Reports wrappers ---
 
-    /** Get donors by city */
     public List<Donor> getDonorsByCity(String city) {
-        return donorDAO.getDonorsByCity(city);
+        return dao.getDonorsByCity(city);
     }
 
-    /** Get donors by blood group */
-    public List<Donor> getDonorsByBloodGroup(String bloodGroup) {
-        return donorDAO.getDonorsByBloodGroup(bloodGroup);
+    public List<Donor> getDonorsByBloodGroup(String bg) {
+        return dao.getDonorsByBloodGroup(bg);
     }
 
-    /** Get eligible donors (who can donate after 'months') */
     public List<Donor> getEligibleDonors(int months) {
-        return donorDAO.getEligibleDonors(months);
+        return dao.getEligibleDonors(months);
     }
 
-    // === Week 6 Enhancements ===
-
-    /** Count donors grouped by blood group */
     public Map<String, Integer> countDonorsByBloodGroup() {
-        return donorDAO.countDonorsByBloodGroup();
+        return dao.countDonorsByBloodGroup();
     }
 
-    /** ✅ Count donors grouped by city and blood group */
     public Map<String, Integer> countDonorsByCityAndBloodGroup() {
-        return donorDAO.countDonorsByCityAndBloodGroup();
+        return dao.countDonorsByCityAndBloodGroup();
     }
 
-    /** Count eligible donors (efficient DB count) */
     public int countEligibleDonors(int months) {
-        return donorDAO.countEligibleDonors(months);
+        return dao.countEligibleDonors(months);
+    }
+
+    // --- Week 7: CSV Import wrapper ---
+    public ImportResult importDonorsFromCsv(String filename) {
+        return dao.importDonorsFromCsv(filename);
     }
 }

@@ -2,13 +2,13 @@ package com.bdms.dao;
 
 import com.bdms.model.Donor;
 import com.bdms.util.DBConnection;
+import com.bdms.util.ImportResult;
 
+import java.io.*;
 import java.sql.*;
+import java.sql.Date;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class DonorDAO {
@@ -187,7 +187,6 @@ public class DonorDAO {
 
     // === Week 5 Enhancements ===
 
-    /** Get donors by city */
     public List<Donor> getDonorsByCity(String city) {
         if (mockMode) {
             return mockDonors.stream()
@@ -209,7 +208,6 @@ public class DonorDAO {
         return list;
     }
 
-    /** Get donors by blood group */
     public List<Donor> getDonorsByBloodGroup(String bloodGroup) {
         if (mockMode) {
             return mockDonors.stream()
@@ -231,7 +229,6 @@ public class DonorDAO {
         return list;
     }
 
-    /** Get eligible donors (didn’t donate in last N months) */
     public List<Donor> getEligibleDonors(int months) {
         if (mockMode) {
             final LocalDate cutoff = LocalDate.now().minusMonths(months);
@@ -258,7 +255,6 @@ public class DonorDAO {
 
     // === Week 6 Enhancements ===
 
-    /** Count donors grouped by blood group */
     public Map<String, Integer> countDonorsByBloodGroup() {
         if (mockMode) {
             Map<String, Integer> map = new LinkedHashMap<>();
@@ -284,7 +280,6 @@ public class DonorDAO {
         return map;
     }
 
-    /** Count donors grouped by city AND blood group */
     public Map<String, Integer> countDonorsByCityAndBloodGroup() {
         if (mockMode) {
             Map<String, Integer> map = new LinkedHashMap<>();
@@ -313,7 +308,6 @@ public class DonorDAO {
         return map;
     }
 
-    /** Count eligible donors */
     public int countEligibleDonors(int months) {
         if (mockMode) {
             return (int) mockDonors.stream()
@@ -335,6 +329,90 @@ public class DonorDAO {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    // === Week 7: CSV Import ===
+
+    public ImportResult importDonorsFromCsv(String filename) {
+        ImportResult result = new ImportResult();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+            String line;
+            boolean firstLine = true;
+
+            while ((line = br.readLine()) != null) {
+                if (firstLine && line.toLowerCase().contains("name,age,gender")) {
+                    firstLine = false;
+                    continue;
+                }
+                result.incTotal();
+                String[] parts = line.split(",", -1);
+                if (parts.length < 6) {
+                    result.incSkipped();
+                    result.addError("Row " + result.getTotal() + ": Not enough columns");
+                    continue;
+                }
+
+                try {
+                    String name = parts[0].trim();
+                    int age = Integer.parseInt(parts[1].trim());
+                    String gender = parts[2].trim();
+                    String bg = parts[3].trim().toUpperCase();
+                    String phone = parts[4].trim();
+                    String city = parts[5].trim();
+                    String dateStr = parts.length > 6 ? parts[6].trim() : "";
+
+                    if (name.isEmpty() || age < 18 ||
+                            !phone.matches("\\d{10}") ||
+                            !isValidBloodGroup(bg)) {
+                        result.incSkipped();
+                        result.addError("Row " + result.getTotal() + ": Invalid data");
+                        continue;
+                    }
+
+                    LocalDate lastDate = null;
+                    if (!dateStr.isEmpty()) {
+                        try {
+                            lastDate = LocalDate.parse(dateStr);
+                        } catch (Exception e) {
+                            result.incSkipped();
+                            result.addError("Row " + result.getTotal() + ": Invalid date");
+                            continue;
+                        }
+                    }
+
+                    if (getDonorByPhone(phone) != null) {
+                        result.incSkipped();
+                        result.addError("Row " + result.getTotal() + ": Duplicate phone " + phone);
+                        continue;
+                    }
+
+                    Donor donor = new Donor(0, name, age, gender, bg, phone, city, lastDate);
+                    boolean ok = addDonor(donor);
+                    if (ok)
+                        result.incSuccess();
+                    else {
+                        result.incSkipped();
+                        result.addError("Row " + result.getTotal() + ": Insert failed");
+                    }
+
+                } catch (Exception e) {
+                    result.incSkipped();
+                    result.addError("Row " + result.getTotal() + ": " + e.getMessage());
+                }
+            }
+        } catch (IOException e) {
+            result.addError("File error: " + e.getMessage());
+        }
+        return result;
+    }
+
+    private boolean isValidBloodGroup(String bg) {
+        String[] groups = { "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-" };
+        for (String g : groups)
+            if (g.equalsIgnoreCase(bg))
+                return true;
+        return false;
     }
 
     // --- helper methods ---

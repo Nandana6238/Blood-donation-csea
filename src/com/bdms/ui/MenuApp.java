@@ -2,12 +2,11 @@ package com.bdms.ui;
 
 import com.bdms.model.Donor;
 import com.bdms.service.DonorService;
+import com.bdms.util.ImportResult;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.Map.Entry;
 
 public class MenuApp {
@@ -33,7 +32,8 @@ public class MenuApp {
             System.out.println("5. Delete Donor");
             System.out.println("6. Find Donor by Phone");
             System.out.println("7. Reports & CSV Export");
-            System.out.println("8. Exit");
+            System.out.println("8. Import Donors from CSV");
+            System.out.println("9. Exit");
             int option = readInt(sc, "Enter choice: ");
 
             switch (option) {
@@ -44,7 +44,8 @@ public class MenuApp {
                 case 5 -> deleteDonorFlow(sc, service);
                 case 6 -> findByPhoneFlow(sc, service);
                 case 7 -> reportsFlow(sc, service);
-                case 8 -> {
+                case 8 -> importCsvFlow(sc, service);
+                case 9 -> {
                     System.out.println("👋 Goodbye!");
                     sc.close();
                     return;
@@ -229,6 +230,35 @@ public class MenuApp {
             System.out.println("✅ Donor found: " + d);
         } else {
             System.out.println("❌ No donor found with this phone.");
+        }
+    }
+
+    private static void importCsvFlow(Scanner sc, DonorService service) {
+        System.out.println("--- Import Donors from CSV ---");
+        String filename = readString(sc, "Enter CSV filename (e.g. sample_data/new_donors.csv): ");
+        ImportResult res = service.importDonorsFromCsv(filename);
+
+        System.out.println("=== Import Summary ===");
+        System.out.println("Total rows: " + res.getTotal());
+        System.out.println("Success:    " + res.getSuccess());
+        System.out.println("Skipped:    " + res.getSkipped());
+
+        if (!res.getErrors().isEmpty()) {
+            System.out.println("--- Errors ---");
+            res.getErrors().forEach(System.out::println);
+            // also write to file
+            try {
+                java.io.File f = new java.io.File("imports");
+                if (!f.exists())
+                    f.mkdir();
+                java.io.PrintWriter pw = new java.io.PrintWriter(new java.io.File(f, "errors.txt"));
+                for (String err : res.getErrors())
+                    pw.println(err);
+                pw.close();
+                System.out.println("Errors written to imports/errors.txt");
+            } catch (Exception e) {
+                System.out.println("❌ Failed to write errors.txt: " + e.getMessage());
+            }
         }
     }
 

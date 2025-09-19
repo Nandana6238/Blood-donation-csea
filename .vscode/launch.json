@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "TestCsvImport",
+            "request": "launch",
+            "mainClass": "com.bdms.test.TestCsvImport",
+            "projectName": "Blood-donation-csea_acacaa67"
+        },
+        {
+            "type": "java",
             "name": "TestSummaryReports",
             "request": "launch",
             "mainClass": "com.bdms.test.TestSummaryReports",
