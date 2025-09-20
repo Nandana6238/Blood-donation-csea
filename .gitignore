@@ -6,6 +6,4 @@ bin/
 # Old folder, don’t track
 BDMS/
 
-# Ignore only test folder,not whole src
-src/com/bdms/test/
 
