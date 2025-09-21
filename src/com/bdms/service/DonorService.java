@@ -21,7 +21,25 @@ public class DonorService {
     }
 
     public List<Donor> getAllDonors() {
+
+        return donorDAO.getAllDonors();
+    }
+
+    public boolean updateDonor(int id, String phone, String city) {
+       // return donorDAO.updateDonor(id, phone, city);
+    Donor donor = new Donor();
+    donor.setId(id);
+    donor.setPhone(phone);
+    donor.setCity(city);
+    return donorDAO.updateDonor(donor);
+}
+    
+
+    public boolean deleteDonor(int id) {
+        return donorDAO.deleteDonor(id);
+
         return dao.getAllDonors();
+
     }
 
     public List<Donor> searchDonors(String bloodGroup, String city) {
