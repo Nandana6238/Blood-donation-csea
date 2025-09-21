@@ -4,7 +4,8 @@ import com.bdms.service.DonorService;
 
 public class TestSearch {
     public static void main(String[] args) {
-        DonorService service = new DonorService();
+        // true = Mock Mode, false = Database Mode
+        DonorService service = new DonorService(true);
 
         System.out.println("=== Searching A+ in Delhi ===");
         service.searchDonors("A+", "Delhi").forEach(System.out::println);
