@@ -1,0 +1,91 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "TestCsvImport",
+            "request": "launch",
+            "mainClass": "com.bdms.test.TestCsvImport",
+            "projectName": "Blood-donation-csea_acacaa67"
+        },
+        {
+            "type": "java",
+            "name": "TestSummaryReports",
+            "request": "launch",
+            "mainClass": "com.bdms.test.TestSummaryReports",
+            "projectName": "Blood-donation-csea_acacaa67"
+        },
+        {
+            "type": "java",
+            "name": "TestReports",
+            "request": "launch",
+            "mainClass": "com.bdms.test.TestReports",
+            "projectName": "Blood-donation-csea_acacaa67"
+        },
+        {
+            "type": "java",
+            "name": "TestDonorServiceNegative",
+            "request": "launch",
+            "mainClass": "com.bdms.test.TestDonorServiceNegative",
+            "projectName": "Blood-donation-csea_acacaa67"
+        },
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "TestDonorServiceDB",
+            "request": "launch",
+            "mainClass": "com.bdms.test.TestDonorServiceDB",
+            "projectName": "Blood-donation-csea_acacaa67"
+        },
+        {
+            "type": "java",
+            "name": "TestDonorServiceManual",
+            "request": "launch",
+            "mainClass": "com.bdms.test.TestDonorServiceManual",
+            "projectName": "Blood-donation-csea_acacaa67"
+        },
+        {
+            "type": "java",
+            "name": "DonorTestApp",
+            "request": "launch",
+            "mainClass": "com.bdms.ui.DonorTestApp",
+            "projectName": "Blood-donation-csea_acacaa67"
+        },
+        {
+            "type": "java",
+            "name": "MainApp",
+            "request": "launch",
+            "mainClass": "com.bdms.ui.MainApp",
+            "projectName": "Blood-donation-csea_acacaa67"
+        },
+        {
+            "type": "java",
+            "name": "MenuApp",
+            "request": "launch",
+            "mainClass": "com.bdms.ui.MenuApp",
+            "projectName": "Blood-donation-csea_acacaa67"
+        },
+        {
+            "type": "java",
+            "name": "TestSearch",
+            "request": "launch",
+            "mainClass": "com.bdms.ui.TestSearch",
+            "projectName": "Blood-donation-csea_acacaa67"
+        },
+        {
+            "type": "java",
+            "name": "TestDBConnection",
+            "request": "launch",
+            "mainClass": "com.bdms.util.TestDBConnection",
+            "projectName": "Blood-donation-csea_acacaa67"
+        }
+    ]
+}

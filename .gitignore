@@ -1,10 +1,14 @@
 # Ignore compiled class files
-.vscode/
-bin/
 *.class
 
-# Old folder, don’t track
-BDMS/
+# Ignore bin directory
+/bin/
 
+# Ignore log files
+*.log
+
+# Ignore system files
+.DS_Store
+Thumbs.db
 
 

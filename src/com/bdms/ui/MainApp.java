@@ -7,6 +7,12 @@ import com.bdms.service.DonorService;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
+import com.bdms.service.DonorService;
+import java.time.LocalDate;
+import java.util.Scanner;
+import com.bdms.dao.DonorDAO;
+import java.util.List;
+
 public class MainApp {
     private static Scanner sc = new Scanner(System.in);
     private static DonorService donorService = new DonorService();
@@ -135,6 +141,22 @@ public class MainApp {
                 case "11": // View All Donations 
                     donationService.showAllDonations();
                     break;
+                    System.out.print("Enter Donor ID: "); 
+                    int dId = sc.nextInt(); sc.nextLine(); 
+                    System.out.print("Enter Donation Date (YYYY-MM-DD): "); 
+                    String dateStr = sc.nextLine(); 
+                    LocalDate dDate = LocalDate.parse(dateStr); 
+                    System.out.print("Enter Volume (ml): "); 
+                    int volume = sc.nextInt(); sc.nextLine(); 
+ 
+                    donationService.addDonation(new Donation(dId, dDate, volume)); 
+                    System.out.println(" Donation recorded successfully!"); 
+                    break;
+                case "10": // View Donation History 
+                    System.out.print("Enter Donor ID: "); 
+                    int donorId = sc.nextInt(); sc.nextLine(); 
+                    donationService.getDonationHistory(donorId).forEach(System.out::println); 
+                    break; 
                 case "0":
                     System.out.println("Exiting... Goodbye!");
                     System.exit(0);
@@ -199,9 +221,20 @@ public class MainApp {
 
     private static void donorTestApp(){
         System.out.println("\n===Donor Test App===");
+    }
+    private static void donorTestApp(){
+        system.out.println("\n===Donor Test App===");
         List<Donor>donors=donorService.getAllDonor();
         for (Donor d:donors){
             System.out.println(d);
         }
      }
 }
+private static void viewAllDonorsUI() {
+    System.out.println("\n=== Donor List ===");
+    donorService.listAllDonors().forEach(donor -> {
+        boolean eligible = donorService.isEligibleToDonate(donor);
+        System.out.println(donor + " | Eligible: " + (eligible ? "YES" : "NO"));
+    });
+}
+ 

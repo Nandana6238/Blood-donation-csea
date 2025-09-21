@@ -1,0 +1,6 @@
+name,age,gender,blood_group,phone,city,last_donation_date
+Test User,25,F,AB+,9999900000,Delhi,2025-05-01
+Another,30,M,O+,9999900001,Kochi,
+InvalidPhone,22,F,A+,abcd,Chennai,
+DupPhone,28,M,B+,9999900000,Delhi,2025-01-01
+TooYoung,16,M,O+,9999900002,Mumbai,2025-02-01
