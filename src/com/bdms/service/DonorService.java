@@ -24,8 +24,14 @@ public class DonorService {
     }
 
     public boolean updateDonor(int id, String phone, String city) {
-        return donorDAO.updateDonor(id, phone, city);
-    }
+       // return donorDAO.updateDonor(id, phone, city);
+    Donor donor = new Donor();
+    donor.setId(id);
+    donor.setPhone(phone);
+    donor.setCity(city);
+    return donorDAO.updateDonor(donor);
+}
+    
 
     public boolean deleteDonor(int id) {
         return donorDAO.deleteDonor(id);
