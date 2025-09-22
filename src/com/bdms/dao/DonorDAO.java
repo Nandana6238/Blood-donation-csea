@@ -11,6 +11,19 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Data Access Object (DAO) for Donor entity.
+ * <p>
+ * Supports two modes:
+ * <ul>
+ * <li><b>Mock Mode:</b> Uses in-memory donor list for testing without DB.</li>
+ * <li><b>DB Mode:</b> Connects to database using {@link DBConnection} and
+ * executes SQL queries.</li>
+ * </ul>
+ * <p>
+ * Provides CRUD operations, search/filter methods, donor statistics,
+ * and CSV import functionality (Week 7).
+ */
 public class DonorDAO {
     private static final List<Donor> mockDonors = new ArrayList<>();
     private final boolean mockMode;
@@ -24,6 +37,11 @@ public class DonorDAO {
         mockDonors.add(new Donor(0, "Arun Kumar", 41, "M", "B-", "9123456789", "Chennai", LocalDate.of(2025, 8, 10)));
     }
 
+    /**
+     * Constructor to initialize DonorDAO.
+     *
+     * @param mockMode true if mock (in-memory) mode, false if DB mode
+     */
     public DonorDAO(boolean mockMode) {
         this.mockMode = mockMode;
         if (mockMode) {
@@ -35,7 +53,12 @@ public class DonorDAO {
         }
     }
 
-    /** Add donor, return true if success, false if duplicate or error */
+    /**
+     * Adds a new donor.
+     *
+     * @param donor Donor object to add
+     * @return true if added successfully, false if duplicate phone or DB error
+     */
     public boolean addDonor(Donor donor) {
         if (mockMode) {
             if (existsByPhoneMock(donor.getPhone()))
@@ -77,7 +100,13 @@ public class DonorDAO {
         }
     }
 
-    /** Search donors by blood group and city */
+    /**
+     * Searches donors by blood group and city.
+     *
+     * @param bloodGroup blood group filter
+     * @param city       city filter
+     * @return list of donors matching both filters
+     */
     public List<Donor> searchDonors(String bloodGroup, String city) {
         if (mockMode) {
             return mockDonors.stream()
@@ -102,7 +131,11 @@ public class DonorDAO {
         return donors;
     }
 
-    /** Get all donors */
+    /**
+     * Fetches all donors from mock list or DB.
+     *
+     * @return list of all donors
+     */
     public List<Donor> getAllDonors() {
         if (mockMode)
             return new ArrayList<>(mockDonors);
@@ -120,7 +153,14 @@ public class DonorDAO {
         return donors;
     }
 
-    /** Update donor phone & city by ID */
+    /**
+     * Updates donor's phone and city by ID.
+     *
+     * @param id    donor ID
+     * @param phone new phone number
+     * @param city  new city
+     * @return true if update successful, false otherwise
+     */
     public boolean updateDonor(int id, String phone, String city) {
         if (mockMode) {
             for (Donor d : mockDonors) {
@@ -146,7 +186,12 @@ public class DonorDAO {
         }
     }
 
-    /** Delete donor by ID */
+    /**
+     * Deletes donor by ID.
+     *
+     * @param id donor ID
+     * @return true if deletion successful, false otherwise
+     */
     public boolean deleteDonor(int id) {
         if (mockMode)
             return mockDonors.removeIf(d -> d.getId() == id);
@@ -162,7 +207,12 @@ public class DonorDAO {
         }
     }
 
-    /** Find donor by phone */
+    /**
+     * Retrieves a donor by phone number.
+     *
+     * @param phone donor phone number
+     * @return donor object or null if not found
+     */
     public Donor getDonorByPhone(String phone) {
         if (mockMode) {
             return mockDonors.stream()
@@ -185,7 +235,12 @@ public class DonorDAO {
         return null;
     }
 
-    // === Week 5 Enhancements ===
+    /**
+     * Retrieves all donors by city.
+     *
+     * @param city city filter
+     * @return list of donors from that city
+     */
 
     public List<Donor> getDonorsByCity(String city) {
         if (mockMode) {
@@ -208,6 +263,13 @@ public class DonorDAO {
         return list;
     }
 
+    /**
+     * Retrieves all donors by city.
+     *
+     * @param city city filter
+     * @return list of donors from that city
+     */
+
     public List<Donor> getDonorsByBloodGroup(String bloodGroup) {
         if (mockMode) {
             return mockDonors.stream()
@@ -229,6 +291,13 @@ public class DonorDAO {
         return list;
     }
 
+    /**
+     * Retrieves donors eligible for donation.
+     * A donor is eligible if last donation is null or before cutoff (months).
+     *
+     * @param months minimum months since last donation
+     * @return list of eligible donors
+     */
     public List<Donor> getEligibleDonors(int months) {
         if (mockMode) {
             final LocalDate cutoff = LocalDate.now().minusMonths(months);
@@ -253,8 +322,11 @@ public class DonorDAO {
         return list;
     }
 
-    // === Week 6 Enhancements ===
-
+    /**
+     * Counts donors grouped by blood group.
+     *
+     * @return map of blood group → count
+     */
     public Map<String, Integer> countDonorsByBloodGroup() {
         if (mockMode) {
             Map<String, Integer> map = new LinkedHashMap<>();
@@ -280,6 +352,11 @@ public class DonorDAO {
         return map;
     }
 
+    /**
+     * Counts donors grouped by city and blood group.
+     *
+     * @return map of "city - bloodGroup" → count
+     */
     public Map<String, Integer> countDonorsByCityAndBloodGroup() {
         if (mockMode) {
             Map<String, Integer> map = new LinkedHashMap<>();
@@ -308,6 +385,12 @@ public class DonorDAO {
         return map;
     }
 
+    /**
+     * Counts total eligible donors.
+     *
+     * @param months months since last donation
+     * @return count of eligible donors
+     */
     public int countEligibleDonors(int months) {
         if (mockMode) {
             return (int) mockDonors.stream()
@@ -331,7 +414,19 @@ public class DonorDAO {
         return 0;
     }
 
-    // === Week 7: CSV Import ===
+    /**
+     * Imports donors from a CSV file.
+     * <p>
+     * CSV format:
+     * 
+     * <pre>
+     * name,age,gender,blood_group,phone,city,last_donation_date
+     * </pre>
+     * </p>
+     *
+     * @param filename CSV file path
+     * @return ImportResult containing stats and errors
+     */
 
     public ImportResult importDonorsFromCsv(String filename) {
         ImportResult result = new ImportResult();
