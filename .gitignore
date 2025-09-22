@@ -2,3 +2,5 @@
 *.class
 # Ignore VS Code settings
 .vscode/
+src/com/bdms/ui/MenuApp.java
+src/com/bdms/ui/MenuApp.java
