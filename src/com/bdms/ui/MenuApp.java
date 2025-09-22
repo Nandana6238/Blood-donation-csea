@@ -9,10 +9,20 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.Map.Entry;
 
+/**
+ * Console-based UI for the Blood Donor Management System.
+ * Provides menu-driven options to manage donors in both mock and DB mode.
+ */
 public class MenuApp {
 
+    /** List of valid blood groups */
     private static final String[] VALID_BLOOD_GROUPS = { "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-" };
 
+    /**
+     * Entry point for the BDMS Menu Application.
+     * 
+     * @param args CLI args (unused)
+     */
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
@@ -23,6 +33,7 @@ public class MenuApp {
 
         DonorService service = new DonorService(mockMode);
 
+        // Menu loop
         while (true) {
             System.out.println("\n=== MENU (" + (mockMode ? "MOCK" : "DB") + ") ===");
             System.out.println("1. Add Donor");
@@ -46,17 +57,23 @@ public class MenuApp {
                 case 7 -> reportsFlow(sc, service);
                 case 8 -> importCsvFlow(sc, service);
                 case 9 -> {
-                    System.out.println("👋 Goodbye!");
+                    System.out.println("Goodbye!");
                     sc.close();
                     return;
                 }
-                default -> System.out.println("❌ Invalid choice, please try again.");
+                default -> System.out.println("Invalid choice, please try again.");
             }
         }
     }
 
-    // ---------------- Reports Flow ----------------
+    // ---------------- Reports ----------------
 
+    /**
+     * Handles reporting and CSV export submenu.
+     * 
+     * @param sc      scanner input
+     * @param service donor service
+     */
     private static void reportsFlow(Scanner sc, DonorService service) {
         List<Donor> lastReport = null;
         while (true) {
@@ -80,7 +97,7 @@ public class MenuApp {
                 case 2 -> {
                     String bg = readString(sc, "Enter Blood Group: ").toUpperCase();
                     if (!isValidBloodGroup(bg)) {
-                        System.out.println("❌ Invalid blood group.");
+                        System.out.println("Invalid blood group.");
                         break;
                     }
                     lastReport = service.getDonorsByBloodGroup(bg);
@@ -106,7 +123,7 @@ public class MenuApp {
                     }
                     String filename = readString(sc, "Enter filename (e.g. donors_detail.csv): ");
                     boolean ok = writeCsv(lastReport, filename);
-                    System.out.println(ok ? "✅ CSV written: exports/" + filename : "❌ Failed to write CSV.");
+                    System.out.println(ok ? "CSV written: exports/" + filename : "Failed to write CSV.");
                 }
                 case 7 -> {
                     System.out.println("Which summary to export? 1=BloodGroup 2=City&BloodGroup");
@@ -115,45 +132,48 @@ public class MenuApp {
                         Map<String, Integer> map = service.countDonorsByBloodGroup();
                         String filename = readString(sc, "Enter filename (e.g. summary_bg.csv): ");
                         boolean ok = writeSummaryCsv(map, filename, "blood_group");
-                        System.out.println(ok ? "✅ CSV written: exports/" + filename : "❌ Failed to write CSV.");
+                        System.out.println(ok ? "CSV written: exports/" + filename : "Failed to write CSV.");
                     } else if (ex == 2) {
                         Map<String, Integer> map = service.countDonorsByCityAndBloodGroup();
                         String filename = readString(sc, "Enter filename (e.g. summary_city_bg.csv): ");
                         boolean ok = writeCityBloodGroupCsv(map, filename);
-                        System.out.println(ok ? "✅ CSV written: exports/" + filename : "❌ Failed to write CSV.");
+                        System.out.println(ok ? "CSV written: exports/" + filename : "Failed to write CSV.");
                     } else {
-                        System.out.println("❌ Invalid choice.");
+                        System.out.println("Invalid choice.");
                     }
                 }
                 case 8 -> {
                     return;
                 }
-                default -> System.out.println("❌ Invalid choice.");
+                default -> System.out.println("Invalid choice.");
             }
         }
     }
 
     // ---------------- Flows ----------------
 
+    /**
+     * Add donor flow - validates and adds donor.
+     */
     private static void addDonorFlow(Scanner sc, DonorService service) {
         System.out.println("--- Add Donor ---");
         String name = readString(sc, "Enter Name: ");
         int age = readInt(sc, "Enter Age: ");
         if (age < 18) {
-            System.out.println("❌ Donor must be at least 18 years old.");
+            System.out.println("Donor must be at least 18 years old.");
             return;
         }
         String gender = readString(sc, "Enter Gender (M/F): ");
 
         String bloodGroup = readString(sc, "Enter Blood Group: ").toUpperCase();
         if (!isValidBloodGroup(bloodGroup)) {
-            System.out.println("❌ Invalid blood group.");
+            System.out.println("Invalid blood group.");
             return;
         }
 
         String phone = readString(sc, "Enter Phone (10 digits): ");
         if (!isValidPhone(phone)) {
-            System.out.println("❌ Invalid phone number.");
+            System.out.println("Invalid phone number.");
             return;
         }
 
@@ -165,21 +185,22 @@ public class MenuApp {
             try {
                 lastDonationDate = LocalDate.parse(dateStr);
             } catch (DateTimeParseException e) {
-                System.out.println("❌ Invalid date format.");
+                System.out.println("Invalid date format.");
                 return;
             }
         }
 
         Donor existing = service.findByPhone(phone);
         if (existing != null) {
-            System.out.println("⚠️ Phone number already exists! Donor not added.");
+            System.out.println("Phone number already exists! Donor not added.");
         } else {
             Donor donor = new Donor(0, name, age, gender, bloodGroup, phone, city, lastDonationDate);
             boolean added = service.addDonor(donor);
-            System.out.println(added ? "✅ Donor added successfully!" : "❌ Donor not added.");
+            System.out.println(added ? "Donor added successfully!" : "Donor not added.");
         }
     }
 
+    /** View all donors */
     private static void viewAllDonors(DonorService service) {
         System.out.println("--- All Donors ---");
         List<Donor> allDonors = service.getAllDonors();
@@ -190,6 +211,7 @@ public class MenuApp {
         }
     }
 
+    /** Search donors by blood group and city */
     private static void searchDonorsFlow(Scanner sc, DonorService service) {
         System.out.println("--- Search Donors ---");
         String bg = readString(sc, "Enter Blood Group: ").toUpperCase();
@@ -202,37 +224,41 @@ public class MenuApp {
         }
     }
 
+    /** Update donor phone and city */
     private static void updateDonorFlow(Scanner sc, DonorService service) {
         System.out.println("--- Update Donor ---");
         int uid = readInt(sc, "Enter Donor ID: ");
         String newPhone = readString(sc, "Enter New Phone (10 digits): ");
         if (!isValidPhone(newPhone)) {
-            System.out.println("❌ Invalid phone number.");
+            System.out.println("Invalid phone number.");
             return;
         }
         String newCity = readString(sc, "Enter New City: ");
         boolean updated = service.updateDonor(uid, newPhone, newCity);
-        System.out.println(updated ? "✅ Donor updated." : "❌ Donor not found.");
+        System.out.println(updated ? "Donor updated." : "Donor not found.");
     }
 
+    /** Delete donor by ID */
     private static void deleteDonorFlow(Scanner sc, DonorService service) {
         System.out.println("--- Delete Donor ---");
         int did = readInt(sc, "Enter Donor ID: ");
         boolean deleted = service.deleteDonor(did);
-        System.out.println(deleted ? "✅ Donor deleted." : "❌ Donor not found.");
+        System.out.println(deleted ? "Donor deleted." : "Donor not found.");
     }
 
+    /** Find donor by phone number */
     private static void findByPhoneFlow(Scanner sc, DonorService service) {
         System.out.println("--- Find Donor by Phone ---");
         String searchPhone = readString(sc, "Enter Phone Number: ");
         Donor d = service.findByPhone(searchPhone);
         if (d != null) {
-            System.out.println("✅ Donor found: " + d);
+            System.out.println("Donor found: " + d);
         } else {
-            System.out.println("❌ No donor found with this phone.");
+            System.out.println("No donor found with this phone.");
         }
     }
 
+    /** Import donors from CSV */
     private static void importCsvFlow(Scanner sc, DonorService service) {
         System.out.println("--- Import Donors from CSV ---");
         String filename = readString(sc, "Enter CSV filename (e.g. sample_data/new_donors.csv): ");
@@ -246,7 +272,6 @@ public class MenuApp {
         if (!res.getErrors().isEmpty()) {
             System.out.println("--- Errors ---");
             res.getErrors().forEach(System.out::println);
-            // also write to file
             try {
                 java.io.File f = new java.io.File("imports");
                 if (!f.exists())
@@ -257,13 +282,14 @@ public class MenuApp {
                 pw.close();
                 System.out.println("Errors written to imports/errors.txt");
             } catch (Exception e) {
-                System.out.println("❌ Failed to write errors.txt: " + e.getMessage());
+                System.out.println("Failed to write errors.txt: " + e.getMessage());
             }
         }
     }
 
     // ---------------- Helpers ----------------
 
+    /** Pretty-print donor table */
     private static void printDonorTable(List<Donor> donors) {
         if (donors == null || donors.isEmpty()) {
             System.out.println("No donors found for this report.");
@@ -280,6 +306,7 @@ public class MenuApp {
         }
     }
 
+    /** Pretty-print summary map */
     private static void printSummaryMap(Map<String, Integer> map, String title) {
         System.out.println("--- " + title + " ---");
         if (map == null || map.isEmpty()) {
@@ -294,6 +321,7 @@ public class MenuApp {
         }
     }
 
+    /** Pretty-print city+blood group summary */
     private static void printCityBloodGroupSummary(Map<String, Integer> map) {
         System.out.println("--- Count by City & Blood Group ---");
         if (map == null || map.isEmpty()) {
@@ -303,15 +331,16 @@ public class MenuApp {
         System.out.printf("%-15s %-10s %8s%n", "CITY", "BGroup", "COUNT");
         System.out.println("---------------------------------------------");
         for (Entry<String, Integer> e : map.entrySet()) {
-            String[] parts = e.getKey().split(" - ", 2);
+            String[] parts = e.getKey().split("\\|", 2);
             String city = parts.length > 0 ? parts[0] : "Not Specified";
             String bg = parts.length > 1 ? parts[1] : "Not Specified";
             System.out.printf("%-15s %-10s %8d%n", city, bg, e.getValue());
         }
     }
 
-    // === CSV Writers with exports/ ===
+    // --- CSV Writers with exports/ ---
 
+    /** Ensure exports directory exists */
     private static java.io.File ensureExportsDir() {
         java.io.File f = new java.io.File("exports");
         if (!f.exists())
@@ -319,6 +348,7 @@ public class MenuApp {
         return f;
     }
 
+    /** Write detailed donor CSV */
     private static boolean writeCsv(List<Donor> donors, String filename) {
         try {
             java.io.File f = ensureExportsDir();
@@ -340,6 +370,7 @@ public class MenuApp {
         }
     }
 
+    /** Write summary CSV */
     private static boolean writeSummaryCsv(Map<String, Integer> map, String filename, String keyHeader) {
         try {
             java.io.File f = ensureExportsDir();
@@ -359,16 +390,17 @@ public class MenuApp {
         }
     }
 
+    /** Write city+blood group summary CSV */
     private static boolean writeCityBloodGroupCsv(Map<String, Integer> map, String filename) {
         try {
             java.io.File f = ensureExportsDir();
             java.io.PrintWriter pw = new java.io.PrintWriter(new java.io.File(f, filename));
-            pw.println("city,blood_group,count");
+            pw.println("City BloodGroup Count");
             for (Entry<String, Integer> e : map.entrySet()) {
-                String[] parts = e.getKey().split(" - ", 2);
+                String[] parts = e.getKey().split("\\|", 2);
                 String city = parts.length > 0 ? parts[0].replace(",", " ") : "Not Specified";
                 String bg = parts.length > 1 ? parts[1] : "Not Specified";
-                pw.printf("%s,%s,%d%n", city, bg, e.getValue());
+                pw.printf("%s\t%s\t\t%d%n", city, bg, e.getValue());
             }
             pw.close();
             return true;
@@ -380,6 +412,7 @@ public class MenuApp {
 
     // --- Validators & Readers ---
 
+    /** Validate blood group */
     private static boolean isValidBloodGroup(String bg) {
         for (String b : VALID_BLOOD_GROUPS) {
             if (b.equalsIgnoreCase(bg))
@@ -388,10 +421,12 @@ public class MenuApp {
         return false;
     }
 
+    /** Validate phone number */
     private static boolean isValidPhone(String phone) {
         return phone != null && phone.matches("\\d{10}");
     }
 
+    /** Read integer with validation */
     private static int readInt(Scanner sc, String prompt) {
         while (true) {
             System.out.print(prompt);
@@ -399,11 +434,12 @@ public class MenuApp {
             try {
                 return Integer.parseInt(input);
             } catch (NumberFormatException e) {
-                System.out.println("❌ Please enter a valid number.");
+                System.out.println("Please enter a valid number.");
             }
         }
     }
 
+    /** Read string */
     private static String readString(Scanner sc, String prompt) {
         System.out.print(prompt);
         return sc.nextLine().trim();
