@@ -41,15 +41,9 @@ public class DonorService {
      */
     public List<Donor> getAllDonors() {
         return dao.getAllDonors();
+
     }
 
-    /**
-     * Search donors by blood group and/or city.
-     * 
-     * @param bloodGroup required blood group (nullable for all groups)
-     * @param city       city name (nullable for all cities)
-     * @return matching donors
-     */
     public List<Donor> searchDonors(String bloodGroup, String city) {
         return dao.searchDonors(bloodGroup, city);
     }
