@@ -36,16 +36,15 @@ public class DonationDAO {
         List<Donation> list = new ArrayList<>();
         String sql = "SELECT * FROM donations WHERE donor_id = ? ORDER BY donation_date DESC";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, donorId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Donation d = new Donation(
-                    rs.getInt("id"),
-                    rs.getInt("donor_id"),
-                    rs.getDate("donation_date").toLocalDate(),
-                    rs.getInt("volume_ml")
-                );
+                        rs.getInt("id"),
+                        rs.getInt("donor_id"),
+                        rs.getDate("donation_date").toLocalDate(),
+                        rs.getInt("volume_ml"));
                 list.add(d);
             }
         } catch (SQLException e) {
@@ -59,15 +58,14 @@ public class DonationDAO {
         List<Donation> list = new ArrayList<>();
         String sql = "SELECT * FROM donations ORDER BY donation_date DESC";
         try (Connection conn = DBConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 Donation d = new Donation(
-                    rs.getInt("id"),
-                    rs.getInt("donor_id"),
-                    rs.getDate("donation_date").toLocalDate(),
-                    rs.getInt("volume_ml")
-                );
+                        rs.getInt("id"),
+                        rs.getInt("donor_id"),
+                        rs.getDate("donation_date").toLocalDate(),
+                        rs.getInt("volume_ml"));
                 list.add(d);
             }
         } catch (SQLException e) {

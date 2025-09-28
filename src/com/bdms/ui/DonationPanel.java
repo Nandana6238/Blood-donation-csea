@@ -1,7 +1,6 @@
 
 package com.bdms.ui;
 
-import com.bdms.model.Donation;
 import com.bdms.service.DonationService;
 
 import javax.swing.*;
@@ -25,14 +24,17 @@ public class DonationPanel extends JPanel {
         JTextField volumeField = new JTextField();
         JButton recordBtn = new JButton("Record Donation");
 
-        form.add(new JLabel("Donor ID")); form.add(donorIdField);
-        form.add(new JLabel("Date")); form.add(dateField);
-        form.add(new JLabel("Volume (ml)")); form.add(volumeField);
+        form.add(new JLabel("Donor ID"));
+        form.add(donorIdField);
+        form.add(new JLabel("Date"));
+        form.add(dateField);
+        form.add(new JLabel("Volume (ml)"));
+        form.add(volumeField);
         form.add(recordBtn);
 
         // Table setup
         tableModel = new DefaultTableModel(
-            new String[]{"ID", "Donor ID", "Date", "Volume"}, 0);
+                new String[] { "ID", "Donor ID", "Date", "Volume" }, 0);
         donationTable = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(donationTable);
 
@@ -61,10 +63,10 @@ public class DonationPanel extends JPanel {
     private void refreshTable() {
         tableModel.setRowCount(0);
         donationService.getAllDonations()
-                .forEach(d -> tableModel.addRow(new Object[]{
+                .forEach(d -> tableModel.addRow(new Object[] {
                         d.getId(),
                         d.getDonorId(),
-                        d.getDate(),
+                        d.getDonationDate(),
                         d.getVolumeMl()
                 }));
     }

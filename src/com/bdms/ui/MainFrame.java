@@ -2,6 +2,7 @@ package com.bdms.ui;
 
 import com.bdms.model.Donor;
 import com.bdms.service.DonorService;
+import com.bdms.service.DonationService;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -12,15 +13,17 @@ import java.util.List;
 public class MainFrame extends JFrame {
 
     private final DonorService donorService;
-    private JTable donorTable;
-    private DefaultTableModel tableModel;
+    private final DonationService donationService;
 
-    // Input fields
+    // Donor tab fields
+    private JTable donorTable;
+    private DefaultTableModel donorTableModel;
     private JTextField idField, nameField, ageField, phoneField, cityField, lastDonationField;
     private JComboBox<String> genderBox, bloodGroupBox;
 
     public MainFrame() {
-        donorService = new DonorService(false); // false = DB mode, true = mock mode
+        donorService = new DonorService(false); // DB mode
+        donationService = new DonationService(); // DB mode
         initUI();
     }
 
@@ -30,13 +33,30 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Table setup
-        String[] columns = { "ID", "Name", "Age", "Gender", "Blood Group", "Phone", "City", "Last Donation" };
-        tableModel = new DefaultTableModel(columns, 0);
-        donorTable = new JTable(tableModel);
+        // Tabbed pane
+        JTabbedPane tabs = new JTabbedPane();
+
+        // Donor tab
+        JPanel donorPanel = createDonorPanel();
+        tabs.addTab("Donors", donorPanel);
+
+        // Donation tab
+        DonationPanel donationPanel = new DonationPanel(donationService);
+        tabs.addTab("Donations", donationPanel);
+
+        add(tabs);
+    }
+
+    private JPanel createDonorPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+
+        // Table
+        String[] donorColumns = { "ID", "Name", "Age", "Gender", "Blood Group", "Phone", "City", "Last Donation" };
+        donorTableModel = new DefaultTableModel(donorColumns, 0);
+        donorTable = new JTable(donorTableModel);
         JScrollPane scrollPane = new JScrollPane(donorTable);
 
-        // Input panel
+        // Input form
         JPanel inputPanel = new JPanel(new GridLayout(3, 6, 10, 10));
 
         idField = new JTextField();
@@ -49,7 +69,7 @@ public class MainFrame extends JFrame {
         genderBox = new JComboBox<>(new String[] { "Male", "Female", "Other" });
         bloodGroupBox = new JComboBox<>(new String[] { "A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-" });
 
-        inputPanel.add(new JLabel("ID (for update/delete):"));
+        inputPanel.add(new JLabel("ID (update/delete):"));
         inputPanel.add(idField);
         inputPanel.add(new JLabel("Name:"));
         inputPanel.add(nameField);
@@ -66,7 +86,7 @@ public class MainFrame extends JFrame {
         inputPanel.add(new JLabel("Last Donation (YYYY-MM-DD):"));
         inputPanel.add(lastDonationField);
 
-        // Button panel
+        // Buttons
         JPanel buttonPanel = new JPanel();
         JButton addBtn = new JButton("Add Donor");
         JButton viewBtn = new JButton("View All");
@@ -80,20 +100,22 @@ public class MainFrame extends JFrame {
         buttonPanel.add(updateBtn);
         buttonPanel.add(deleteBtn);
 
-        // Action Listeners
+        // Button actions
         addBtn.addActionListener(e -> addDonor());
         viewBtn.addActionListener(e -> loadAllDonors());
         searchBtn.addActionListener(e -> searchDonors());
         updateBtn.addActionListener(e -> updateDonor());
         deleteBtn.addActionListener(e -> deleteDonor());
 
-        // Layout
-        setLayout(new BorderLayout());
-        add(inputPanel, BorderLayout.NORTH);
-        add(scrollPane, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
+        panel.add(inputPanel, BorderLayout.NORTH);
+        panel.add(scrollPane, BorderLayout.CENTER);
+        panel.add(buttonPanel, BorderLayout.SOUTH);
+
+        loadAllDonors(); // Initial load
+        return panel;
     }
 
+    // ===== Donor methods =====
     private void addDonor() {
         try {
             String name = nameField.getText();
@@ -116,6 +138,7 @@ public class MainFrame extends JFrame {
             if (donorService.addDonor(donor)) {
                 JOptionPane.showMessageDialog(this, "Donor added successfully!");
                 loadAllDonors();
+                clearDonorFields();
             } else {
                 JOptionPane.showMessageDialog(this, "Failed to add donor (maybe duplicate phone).");
             }
@@ -126,14 +149,14 @@ public class MainFrame extends JFrame {
 
     private void loadAllDonors() {
         List<Donor> donors = donorService.getAllDonors();
-        refreshTable(donors);
+        refreshDonorTable(donors);
     }
 
     private void searchDonors() {
         String bg = (String) bloodGroupBox.getSelectedItem();
         String city = cityField.getText().trim().isEmpty() ? null : cityField.getText().trim();
         List<Donor> donors = donorService.searchDonors(bg, city);
-        refreshTable(donors);
+        refreshDonorTable(donors);
     }
 
     private void updateDonor() {
@@ -167,15 +190,26 @@ public class MainFrame extends JFrame {
         }
     }
 
-    private void refreshTable(List<Donor> donors) {
-        tableModel.setRowCount(0);
+    private void refreshDonorTable(List<Donor> donors) {
+        donorTableModel.setRowCount(0);
         for (Donor d : donors) {
-            tableModel.addRow(new Object[] {
+            donorTableModel.addRow(new Object[] {
                     d.getId(), d.getName(), d.getAge(), d.getGender(),
                     d.getBloodGroup(), d.getPhone(), d.getCity(),
                     d.getLastDonationDate()
             });
         }
+    }
+
+    private void clearDonorFields() {
+        idField.setText("");
+        nameField.setText("");
+        ageField.setText("");
+        phoneField.setText("");
+        cityField.setText("");
+        lastDonationField.setText("");
+        genderBox.setSelectedIndex(0);
+        bloodGroupBox.setSelectedIndex(0);
     }
 
     public static void main(String[] args) {
