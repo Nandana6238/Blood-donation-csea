@@ -1,14 +1,8 @@
+# Ignore VS Code workspace settings folder
+.vscode/
+
 # Ignore compiled class files
 *.class
 
 # Ignore bin directory
 /bin/
-
-# Ignore log files
-*.log
-
-# Ignore system files
-.DS_Store
-Thumbs.db
-
-
