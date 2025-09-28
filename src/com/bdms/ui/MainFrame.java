@@ -5,6 +5,7 @@ import com.bdms.service.DonorService;
 import com.bdms.service.DonationService;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.time.LocalDate;
@@ -22,8 +23,8 @@ public class MainFrame extends JFrame {
     private JComboBox<String> genderBox, bloodGroupBox;
 
     public MainFrame() {
-        donorService = new DonorService(false); // DB mode
-        donationService = new DonationService(); // DB mode
+        donorService = new DonorService(false);
+        donationService = new DonationService();
         initUI();
     }
 
@@ -33,38 +34,61 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Tabbed pane
+        // Modern look & feel
+        try {
+            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+            SwingUtilities.updateComponentTreeUI(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         JTabbedPane tabs = new JTabbedPane();
-
-        // Donor tab
-        JPanel donorPanel = createDonorPanel();
-        tabs.addTab("Donors", donorPanel);
-
-        // Donation tab
-        DonationPanel donationPanel = new DonationPanel(donationService);
-        tabs.addTab("Donations", donationPanel);
+        tabs.addTab("Donors", createDonorPanel());
+        tabs.addTab("Donations", new DonationPanel(donationService));
 
         add(tabs);
     }
 
     private JPanel createDonorPanel() {
         JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(new Color(245, 245, 245));
 
-        // Table
+        // ===== Table =====
         String[] donorColumns = { "ID", "Name", "Age", "Gender", "Blood Group", "Phone", "City", "Last Donation" };
         donorTableModel = new DefaultTableModel(donorColumns, 0);
         donorTable = new JTable(donorTableModel);
+        donorTable.setBackground(Color.WHITE);
+        donorTable.setForeground(Color.DARK_GRAY);
+        donorTable.setFont(new Font("Tahoma", Font.PLAIN, 12));
+        donorTable.getTableHeader().setBackground(new Color(0, 123, 255));
+        donorTable.getTableHeader().setForeground(Color.WHITE);
+        donorTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
+        donorTable.setRowHeight(25);
         JScrollPane scrollPane = new JScrollPane(donorTable);
 
-        // Input form
+        // ===== Input Form =====
         JPanel inputPanel = new JPanel(new GridLayout(3, 6, 10, 10));
+        inputPanel.setBackground(Color.WHITE);
+        inputPanel.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(new Color(0, 123, 255), 2),
+                "Add / Update Donor",
+                TitledBorder.LEFT,
+                TitledBorder.TOP,
+                new Font("Arial", Font.BOLD, 14),
+                new Color(0, 123, 255)));
 
         idField = new JTextField();
+        idField.setBackground(Color.WHITE);
         nameField = new JTextField();
+        nameField.setBackground(Color.WHITE);
         ageField = new JTextField();
+        ageField.setBackground(Color.WHITE);
         phoneField = new JTextField();
+        phoneField.setBackground(Color.WHITE);
         cityField = new JTextField();
+        cityField.setBackground(Color.WHITE);
         lastDonationField = new JTextField();
+        lastDonationField.setBackground(Color.WHITE);
 
         genderBox = new JComboBox<>(new String[] { "Male", "Female", "Other" });
         bloodGroupBox = new JComboBox<>(new String[] { "A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-" });
@@ -86,13 +110,14 @@ public class MainFrame extends JFrame {
         inputPanel.add(new JLabel("Last Donation (YYYY-MM-DD):"));
         inputPanel.add(lastDonationField);
 
-        // Buttons
+        // ===== Buttons =====
         JPanel buttonPanel = new JPanel();
-        JButton addBtn = new JButton("Add Donor");
-        JButton viewBtn = new JButton("View All");
-        JButton searchBtn = new JButton("Search");
-        JButton updateBtn = new JButton("Update");
-        JButton deleteBtn = new JButton("Delete");
+        buttonPanel.setBackground(new Color(245, 245, 245));
+        JButton addBtn = createButton("Add Donor");
+        JButton viewBtn = createButton("View All");
+        JButton searchBtn = createButton("Search");
+        JButton updateBtn = createButton("Update");
+        JButton deleteBtn = createButton("Delete");
 
         buttonPanel.add(addBtn);
         buttonPanel.add(viewBtn);
@@ -100,7 +125,7 @@ public class MainFrame extends JFrame {
         buttonPanel.add(updateBtn);
         buttonPanel.add(deleteBtn);
 
-        // Button actions
+        // ===== Button actions =====
         addBtn.addActionListener(e -> addDonor());
         viewBtn.addActionListener(e -> loadAllDonors());
         searchBtn.addActionListener(e -> searchDonors());
@@ -111,8 +136,17 @@ public class MainFrame extends JFrame {
         panel.add(scrollPane, BorderLayout.CENTER);
         panel.add(buttonPanel, BorderLayout.SOUTH);
 
-        loadAllDonors(); // Initial load
+        loadAllDonors();
         return panel;
+    }
+
+    // ===== Helper to create styled buttons =====
+    private JButton createButton(String text) {
+        JButton btn = new JButton(text);
+        btn.setBackground(new Color(0, 123, 255));
+        btn.setForeground(Color.WHITE);
+        btn.setFont(new Font("Arial", Font.BOLD, 14));
+        return btn;
     }
 
     // ===== Donor methods =====
