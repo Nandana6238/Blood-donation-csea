@@ -16,7 +16,9 @@ public class MainFrame extends JFrame {
     private final DonorService donorService;
     private final DonationService donationService;
 
-    // Donor tab fields
+    private JTabbedPane tabbedPane;
+
+    // Donor panel components
     private JTable donorTable;
     private DefaultTableModel donorTableModel;
     private JTextField idField, nameField, ageField, phoneField, cityField, lastDonationField;
@@ -30,53 +32,41 @@ public class MainFrame extends JFrame {
 
     private void initUI() {
         setTitle("Blood Donor Management System");
-        setSize(1000, 600);
+        setSize(1200, 700);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Modern look & feel
-        try {
-            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-            SwingUtilities.updateComponentTreeUI(this);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        tabbedPane = new JTabbedPane();
 
-        JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab("Donors", createDonorPanel());
-        tabs.addTab("Donations", new DonationPanel(donationService));
+        // Dashboard
+        DashboardPanel dashboardPanel = new DashboardPanel(donationService, this);
 
-        add(tabs);
+        tabbedPane.addTab("Dashboard", dashboardPanel);
+
+        // Donor Management
+        JPanel donorPanel = createDonorPanel();
+        tabbedPane.addTab("Donors", donorPanel);
+
+        // Donation Management
+        DonationPanel donationPanel = new DonationPanel(donationService);
+        tabbedPane.addTab("Donations", donationPanel);
+
+        add(tabbedPane, BorderLayout.CENTER);
     }
 
-    private JPanel createDonorPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(new Color(245, 245, 245));
+    // Method to switch tab by title
+    public void switchToTab(String title) {
+        int index = tabbedPane.indexOfTab(title);
+        if (index != -1)
+            tabbedPane.setSelectedIndex(index);
+    }
 
-        // ===== Table =====
-        String[] donorColumns = { "ID", "Name", "Age", "Gender", "Blood Group", "Phone", "City", "Last Donation" };
-        donorTableModel = new DefaultTableModel(donorColumns, 0);
-        donorTable = new JTable(donorTableModel);
-        donorTable.setBackground(Color.WHITE);
-        donorTable.setForeground(Color.DARK_GRAY);
-        donorTable.setFont(new Font("Tahoma", Font.PLAIN, 12));
-        donorTable.getTableHeader().setBackground(new Color(0, 123, 255));
-        donorTable.getTableHeader().setForeground(Color.WHITE);
-        donorTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
-        donorTable.setRowHeight(25);
-        JScrollPane scrollPane = new JScrollPane(donorTable);
+    // ---------------- Donor Panel ----------------
+    private JPanel createDonorPanel() {
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
 
         // ===== Input Form =====
         JPanel inputPanel = new JPanel(new GridLayout(3, 6, 10, 10));
-        inputPanel.setBackground(Color.WHITE);
-        inputPanel.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(new Color(0, 123, 255), 2),
-                "Add / Update Donor",
-                TitledBorder.LEFT,
-                TitledBorder.TOP,
-                new Font("Arial", Font.BOLD, 14),
-                new Color(0, 123, 255)));
-
         idField = new JTextField();
         idField.setBackground(Color.WHITE);
         nameField = new JTextField();
@@ -88,8 +78,6 @@ public class MainFrame extends JFrame {
         cityField = new JTextField();
         cityField.setBackground(Color.WHITE);
         lastDonationField = new JTextField();
-        lastDonationField.setBackground(Color.WHITE);
-
         genderBox = new JComboBox<>(new String[] { "Male", "Female", "Other" });
         bloodGroupBox = new JComboBox<>(new String[] { "A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-" });
 
@@ -110,7 +98,13 @@ public class MainFrame extends JFrame {
         inputPanel.add(new JLabel("Last Donation (YYYY-MM-DD):"));
         inputPanel.add(lastDonationField);
 
-        // ===== Buttons =====
+        // Donor table
+        donorTableModel = new DefaultTableModel(
+                new String[] { "ID", "Name", "Age", "Gender", "Blood Group", "Phone", "City", "Last Donation" }, 0);
+        donorTable = new JTable(donorTableModel);
+        JScrollPane tableScroll = new JScrollPane(donorTable);
+
+        // Buttons
         JPanel buttonPanel = new JPanel();
         buttonPanel.setBackground(new Color(245, 245, 245));
         JButton addBtn = createButton("Add Donor");
@@ -119,62 +113,45 @@ public class MainFrame extends JFrame {
         JButton updateBtn = createButton("Update");
         JButton deleteBtn = createButton("Delete");
 
-        buttonPanel.add(addBtn);
-        buttonPanel.add(viewBtn);
-        buttonPanel.add(searchBtn);
-        buttonPanel.add(updateBtn);
-        buttonPanel.add(deleteBtn);
-
-        // ===== Button actions =====
         addBtn.addActionListener(e -> addDonor());
         viewBtn.addActionListener(e -> loadAllDonors());
         searchBtn.addActionListener(e -> searchDonors());
         updateBtn.addActionListener(e -> updateDonor());
         deleteBtn.addActionListener(e -> deleteDonor());
 
+        buttonPanel.add(addBtn);
+        buttonPanel.add(viewBtn);
+        buttonPanel.add(searchBtn);
+        buttonPanel.add(updateBtn);
+        buttonPanel.add(deleteBtn);
+
         panel.add(inputPanel, BorderLayout.NORTH);
-        panel.add(scrollPane, BorderLayout.CENTER);
+        panel.add(tableScroll, BorderLayout.CENTER);
         panel.add(buttonPanel, BorderLayout.SOUTH);
 
-        loadAllDonors();
         return panel;
     }
 
-    // ===== Helper to create styled buttons =====
-    private JButton createButton(String text) {
-        JButton btn = new JButton(text);
-        btn.setBackground(new Color(0, 123, 255));
-        btn.setForeground(Color.WHITE);
-        btn.setFont(new Font("Arial", Font.BOLD, 14));
-        return btn;
-    }
-
-    // ===== Donor methods =====
+    // ---------------- Donor CRUD ----------------
     private void addDonor() {
         try {
             String name = nameField.getText();
             int age = Integer.parseInt(ageField.getText());
             String gender = (String) genderBox.getSelectedItem();
+            String bloodGroup = (String) bloodGroupBox.getSelectedItem();
             String phone = phoneField.getText();
             String city = cityField.getText();
-            String bloodGroup = (String) bloodGroupBox.getSelectedItem();
             String lastDonationStr = lastDonationField.getText();
+            LocalDate lastDonation = lastDonationStr.isEmpty() ? null : LocalDate.parse(lastDonationStr);
 
-            Donor donor = new Donor(
-                    name,
-                    age,
-                    gender,
-                    bloodGroup,
-                    phone,
-                    city,
-                    lastDonationStr.isEmpty() ? null : LocalDate.parse(lastDonationStr));
+            Donor donor = new Donor(0, name, age, gender, bloodGroup, phone, city, lastDonation);
 
             if (donorService.addDonor(donor)) {
-                JOptionPane.showMessageDialog(this, "Donor added successfully!");
+                JOptionPane.showMessageDialog(this, " Donor added successfully!");
                 loadAllDonors();
                 clearDonorFields();
             } else {
-                JOptionPane.showMessageDialog(this, "Failed to add donor (maybe duplicate phone).");
+                JOptionPane.showMessageDialog(this, "Failed to add donor (duplicate phone?).");
             }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
@@ -198,13 +175,9 @@ public class MainFrame extends JFrame {
             int id = Integer.parseInt(idField.getText());
             String phone = phoneField.getText();
             String city = cityField.getText();
-
-            if (donorService.updateDonor(id, phone, city)) {
-                JOptionPane.showMessageDialog(this, "Donor updated successfully!");
-                loadAllDonors();
-            } else {
-                JOptionPane.showMessageDialog(this, "Update failed.");
-            }
+            boolean updated = donorService.updateDonor(id, phone, city);
+            JOptionPane.showMessageDialog(this, updated ? "Donor updated!" : "Update failed!");
+            loadAllDonors();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
         }
@@ -213,12 +186,9 @@ public class MainFrame extends JFrame {
     private void deleteDonor() {
         try {
             int id = Integer.parseInt(idField.getText());
-            if (donorService.deleteDonor(id)) {
-                JOptionPane.showMessageDialog(this, "Donor deleted successfully!");
-                loadAllDonors();
-            } else {
-                JOptionPane.showMessageDialog(this, "Delete failed.");
-            }
+            boolean deleted = donorService.deleteDonor(id);
+            JOptionPane.showMessageDialog(this, deleted ? "Donor deleted!" : "Delete failed!");
+            loadAllDonors();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
         }
