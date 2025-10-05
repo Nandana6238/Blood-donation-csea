@@ -5,6 +5,7 @@ import com.bdms.service.DonorService;
 import com.bdms.service.DonationService;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.time.LocalDate;
@@ -24,7 +25,7 @@ public class MainFrame extends JFrame {
     private JComboBox<String> genderBox, bloodGroupBox;
 
     public MainFrame() {
-        donorService = new DonorService(false); // DB mode
+        donorService = new DonorService(false);
         donationService = new DonationService();
         initUI();
     }
@@ -64,18 +65,23 @@ public class MainFrame extends JFrame {
     private JPanel createDonorPanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
 
-        // Input panel
+        // ===== Input Form =====
         JPanel inputPanel = new JPanel(new GridLayout(3, 6, 10, 10));
         idField = new JTextField();
+        idField.setBackground(Color.WHITE);
         nameField = new JTextField();
+        nameField.setBackground(Color.WHITE);
         ageField = new JTextField();
+        ageField.setBackground(Color.WHITE);
         phoneField = new JTextField();
+        phoneField.setBackground(Color.WHITE);
         cityField = new JTextField();
+        cityField.setBackground(Color.WHITE);
         lastDonationField = new JTextField();
         genderBox = new JComboBox<>(new String[] { "Male", "Female", "Other" });
         bloodGroupBox = new JComboBox<>(new String[] { "A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-" });
 
-        inputPanel.add(new JLabel("ID (for update/delete):"));
+        inputPanel.add(new JLabel("ID (update/delete):"));
         inputPanel.add(idField);
         inputPanel.add(new JLabel("Name:"));
         inputPanel.add(nameField);
@@ -100,11 +106,12 @@ public class MainFrame extends JFrame {
 
         // Buttons
         JPanel buttonPanel = new JPanel();
-        JButton addBtn = new JButton("Add Donor");
-        JButton viewBtn = new JButton("View All");
-        JButton searchBtn = new JButton("Search");
-        JButton updateBtn = new JButton("Update");
-        JButton deleteBtn = new JButton("Delete");
+        buttonPanel.setBackground(new Color(245, 245, 245));
+        JButton addBtn = createButton("Add Donor");
+        JButton viewBtn = createButton("View All");
+        JButton searchBtn = createButton("Search");
+        JButton updateBtn = createButton("Update");
+        JButton deleteBtn = createButton("Delete");
 
         addBtn.addActionListener(e -> addDonor());
         viewBtn.addActionListener(e -> loadAllDonors());
@@ -142,6 +149,7 @@ public class MainFrame extends JFrame {
             if (donorService.addDonor(donor)) {
                 JOptionPane.showMessageDialog(this, " Donor added successfully!");
                 loadAllDonors();
+                clearDonorFields();
             } else {
                 JOptionPane.showMessageDialog(this, "Failed to add donor (duplicate phone?).");
             }
@@ -195,6 +203,17 @@ public class MainFrame extends JFrame {
                     d.getLastDonationDate()
             });
         }
+    }
+
+    private void clearDonorFields() {
+        idField.setText("");
+        nameField.setText("");
+        ageField.setText("");
+        phoneField.setText("");
+        cityField.setText("");
+        lastDonationField.setText("");
+        genderBox.setSelectedIndex(0);
+        bloodGroupBox.setSelectedIndex(0);
     }
 
     public static void main(String[] args) {

@@ -1,6 +1,5 @@
 package com.bdms.ui;
 
-import com.bdms.model.Donation;
 import com.bdms.service.DonationService;
 
 import javax.swing.*;
@@ -38,6 +37,13 @@ public class DonationPanel extends JPanel {
 
         tableModel = new DefaultTableModel(new String[] { "ID", "Donor ID", "Date", "Volume" }, 0);
         donationTable = new JTable(tableModel);
+        donationTable.setBackground(Color.WHITE);
+        donationTable.setForeground(Color.DARK_GRAY);
+        donationTable.setFont(new Font("Tahoma", Font.PLAIN, 12));
+        donationTable.getTableHeader().setBackground(new Color(0, 123, 255));
+        donationTable.getTableHeader().setForeground(Color.WHITE);
+        donationTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
+        donationTable.setRowHeight(25);
         JScrollPane scrollPane = new JScrollPane(donationTable);
 
         JPanel buttonPanel = new JPanel();

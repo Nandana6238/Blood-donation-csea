@@ -12,6 +12,12 @@ public class DonationService {
 
     private final DonationDAO donationDAO = new DonationDAO();
 
+    // Constructor
+    public DonationService() {
+        this.donationDAO = new DonationDAO();
+    }
+
+    // Record a donation
     public void recordDonation(int donorId, LocalDate date, int volumeMl) {
         Donation donation = new Donation(donorId, date, volumeMl);
         donationDAO.addDonation(donation);
@@ -39,5 +45,10 @@ public class DonationService {
             System.err.println("Error exporting donation summary: " + e.getMessage());
             return false;
         }
+    }
+
+    // Optional: expose all donations for GUI
+    public List<Donation> getAllDonations() {
+        return donationDAO.getAllDonations();
     }
 }
