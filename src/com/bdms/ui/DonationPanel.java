@@ -1,4 +1,3 @@
-
 package com.bdms.ui;
 
 import com.bdms.model.Donation;
@@ -8,64 +7,80 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.time.LocalDate;
+import java.util.List;
 
 public class DonationPanel extends JPanel {
+
     private DonationService donationService;
     private JTable donationTable;
     private DefaultTableModel tableModel;
+    private JTextField donorIdField, dateField, volumeField;
 
     public DonationPanel(DonationService donationService) {
         this.donationService = donationService;
-        setLayout(new BorderLayout());
+        initUI();
+    }
 
-        // Form inputs
-        JPanel form = new JPanel(new GridLayout(0, 2, 5, 5));
-        JTextField donorIdField = new JTextField();
-        JTextField dateField = new JTextField("YYYY-MM-DD");
-        JTextField volumeField = new JTextField();
-        JButton recordBtn = new JButton("Record Donation");
+    private void initUI() {
+        setLayout(new BorderLayout(10, 10));
 
-        form.add(new JLabel("Donor ID")); form.add(donorIdField);
-        form.add(new JLabel("Date")); form.add(dateField);
-        form.add(new JLabel("Volume (ml)")); form.add(volumeField);
-        form.add(recordBtn);
+        JPanel inputPanel = new JPanel(new GridLayout(1, 6, 10, 10));
+        donorIdField = new JTextField();
+        dateField = new JTextField();
+        volumeField = new JTextField();
 
-        // Table setup
-        tableModel = new DefaultTableModel(
-            new String[]{"ID", "Donor ID", "Date", "Volume"}, 0);
+        inputPanel.add(new JLabel("Donor ID:"));
+        inputPanel.add(donorIdField);
+        inputPanel.add(new JLabel("Date (YYYY-MM-DD):"));
+        inputPanel.add(dateField);
+        inputPanel.add(new JLabel("Volume (ml):"));
+        inputPanel.add(volumeField);
+
+        tableModel = new DefaultTableModel(new String[] { "ID", "Donor ID", "Date", "Volume" }, 0);
         donationTable = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(donationTable);
 
-        add(form, BorderLayout.NORTH);
-        add(scrollPane, BorderLayout.CENTER);
+        JPanel buttonPanel = new JPanel();
+        JButton addBtn = new JButton("Add Donation");
+        JButton viewBtn = new JButton("View All");
+        JButton exportBtn = new JButton("Export CSV");
 
-        // Button action
-        recordBtn.addActionListener(e -> {
-            try {
-                int donorId = Integer.parseInt(donorIdField.getText());
-                LocalDate date = LocalDate.parse(dateField.getText());
-                int volume = Integer.parseInt(volumeField.getText());
-
-                donationService.recordDonation(donorId, date, volume);
-                refreshTable();
-
-                JOptionPane.showMessageDialog(this, "✅ Donation recorded!");
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+        addBtn.addActionListener(e -> addDonation());
+        viewBtn.addActionListener(e -> loadAllDonations());
+        exportBtn.addActionListener(e -> {
+            String filename = JOptionPane.showInputDialog(this, "Enter filename (example.csv):");
+            if (filename != null && !filename.isEmpty()) {
+                boolean success = donationService.exportDonationSummaryCsv(filename);
+                JOptionPane.showMessageDialog(this, success ? "✅ Export successful!" : "⚠ Export failed!");
             }
         });
 
-        refreshTable();
+        buttonPanel.add(addBtn);
+        buttonPanel.add(viewBtn);
+        buttonPanel.add(exportBtn);
+
+        add(inputPanel, BorderLayout.NORTH);
+        add(scrollPane, BorderLayout.CENTER);
+        add(buttonPanel, BorderLayout.SOUTH);
     }
 
-    private void refreshTable() {
+    private void addDonation() {
+        try {
+            int donorId = Integer.parseInt(donorIdField.getText());
+            LocalDate date = LocalDate.parse(dateField.getText());
+            int volume = Integer.parseInt(volumeField.getText());
+            donationService.recordDonation(donorId, date, volume);
+            loadAllDonations();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+        }
+    }
+
+    private void loadAllDonations() {
+        List<Donation> donations = donationService.getAllDonations();
         tableModel.setRowCount(0);
-        donationService.getAllDonations()
-                .forEach(d -> tableModel.addRow(new Object[]{
-                        d.getId(),
-                        d.getDonorId(),
-                        d.getDate(),
-                        d.getVolumeMl()
-                }));
+        for (Donation d : donations) {
+            tableModel.addRow(new Object[] { d.getId(), d.getDonorId(), d.getDate(), d.getVolumeMl() });
+        }
     }
 }

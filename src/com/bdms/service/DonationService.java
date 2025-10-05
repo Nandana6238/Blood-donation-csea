@@ -2,33 +2,42 @@ package com.bdms.service;
 
 import com.bdms.dao.DonationDAO;
 import com.bdms.model.Donation;
+
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
 public class DonationService {
-    private DonationDAO donationDAO = new DonationDAO();
+
+    private final DonationDAO donationDAO = new DonationDAO();
 
     public void recordDonation(int donorId, LocalDate date, int volumeMl) {
         Donation donation = new Donation(donorId, date, volumeMl);
         donationDAO.addDonation(donation);
-        System.out.println("✅ Donation recorded successfully!");
     }
 
-    public void showDonationHistory(int donorId) {
-        List<Donation> history = donationDAO.getDonationHistory(donorId);
-        if (history.isEmpty()) {
-            System.out.println("ℹ No donation history found.");
-        } else {
-            history.forEach(System.out::println);
-        }
+    public List<Donation> getDonationHistory(int donorId) {
+        return donationDAO.getDonationHistory(donorId);
     }
 
-    public void showAllDonations() {
-        List<Donation> all = donationDAO.getAllDonations();
-        if (all.isEmpty()) {
-            System.out.println("ℹ No donations found in the system.");
-        } else {
-            all.forEach(System.out::println);
+    public List<Donation> getAllDonations() {
+        return donationDAO.getAllDonations();
+    }
+
+    public boolean exportDonationSummaryCsv(String filePath) {
+        List<Donation> list = getAllDonations();
+        if (list.isEmpty())
+            return false;
+        try (FileWriter fw = new FileWriter(filePath)) {
+            fw.write("id,donor_id,donation_date,volume_ml\n");
+            for (Donation d : list) {
+                fw.write(String.format("%d,%d,%s,%d\n", d.getId(), d.getDonorId(), d.getDate(), d.getVolumeMl()));
+            }
+            return true;
+        } catch (IOException e) {
+            System.err.println("Error exporting donation summary: " + e.getMessage());
+            return false;
         }
     }
 }
