@@ -1,6 +1,7 @@
 package com.bdms.dao;
 
 import com.bdms.model.Donor;
+import com.bdms.ui.DBConnection;
 import com.bdms.util.DBConnection;
 import com.bdms.util.ImportResult;
 

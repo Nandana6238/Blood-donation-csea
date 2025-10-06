@@ -73,3 +73,16 @@ public class Donor {
                ", LastDonationDate=" + lastDonationDate + "]";
     }
 }
+
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
+public class DonorService {
+    public boolean isEligibleToDonate(Donor donor) {
+        if (donor.getAge() < 18 || donor.getAge() > 60) return false; 
+        if (donor.getLastDonationDate() == null) return true; 
+
+        long days = ChronoUnit.DAYS.between(donor.getLastDonationDate(), LocalDate.now());
+        return days >= 90; 
+    }
+}
