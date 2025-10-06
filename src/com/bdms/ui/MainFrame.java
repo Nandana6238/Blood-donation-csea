@@ -5,7 +5,6 @@ import com.bdms.service.DonorService;
 import com.bdms.service.DonationService;
 
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.time.LocalDate;
@@ -214,6 +213,16 @@ public class MainFrame extends JFrame {
         lastDonationField.setText("");
         genderBox.setSelectedIndex(0);
         bloodGroupBox.setSelectedIndex(0);
+    }
+
+    // Utility method to create styled JButton
+    private JButton createButton(String text) {
+        JButton button = new JButton(text);
+        button.setFocusPainted(false);
+        button.setBackground(new Color(220, 53, 69));
+        button.setForeground(Color.WHITE);
+        button.setFont(new Font("Arial", Font.BOLD, 14));
+        return button;
     }
 
     public static void main(String[] args) {

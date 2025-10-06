@@ -14,7 +14,7 @@ public class DonationService {
 
     // Constructor
     public DonationService() {
-        this.donationDAO = new DonationDAO();
+        // No need to reassign donationDAO since it's already initialized
     }
 
     // Record a donation
@@ -48,7 +48,4 @@ public class DonationService {
     }
 
     // Optional: expose all donations for GUI
-    public List<Donation> getAllDonations() {
-        return donationDAO.getAllDonations();
-    }
 }

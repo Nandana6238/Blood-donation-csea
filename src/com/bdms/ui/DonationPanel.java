@@ -1,6 +1,7 @@
 package com.bdms.ui;
 
 import com.bdms.service.DonationService;
+import com.bdms.model.Donation;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -57,7 +58,7 @@ public class DonationPanel extends JPanel {
             String filename = JOptionPane.showInputDialog(this, "Enter filename (example.csv):");
             if (filename != null && !filename.isEmpty()) {
                 boolean success = donationService.exportDonationSummaryCsv(filename);
-                JOptionPane.showMessageDialog(this, success ? "✅ Export successful!" : "⚠ Export failed!");
+                JOptionPane.showMessageDialog(this, success ? "Export successful!" : "Export failed!");
             }
         });
 
