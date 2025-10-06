@@ -5,35 +5,56 @@ import java.time.LocalDate;
 public class Donation {
     private int id;
     private int donorId;
-    private LocalDate donationDate;
+    private LocalDate date;
     private int volumeMl;
 
-    // Constructor for inserting a new donation (no ID yet, DB will auto-generate)
-    public Donation(int donorId, LocalDate donationDate, int volumeMl) {
+    public Donation(int donorId, LocalDate date, int volumeMl) {
         this.donorId = donorId;
-        this.donationDate = donationDate;
+        this.date = date;
         this.volumeMl = volumeMl;
     }
 
-    // Constructor with ID (useful when retrieving from DB)
-    public Donation(int id, int donorId, LocalDate donationDate, int volumeMl) {
+    public Donation(int id, int donorId, LocalDate date, int volumeMl) {
         this.id = id;
         this.donorId = donorId;
-        this.donationDate = donationDate;
+        this.date = date;
         this.volumeMl = volumeMl;
     }
 
-    // Getters
-    public int getId() { return id; }
-    public int getDonorId() { return donorId; }
-    public LocalDate getDonationDate() { return donationDate; }
-    public int getVolumeMl() { return volumeMl; }
+    public int getId() {
+        return id;
+    }
+
+    public int getDonorId() {
+        return donorId;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public int getVolumeMl() {
+        return volumeMl;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setDonorId(int donorId) {
+        this.donorId = donorId;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+    public void setVolumeMl(int volumeMl) {
+        this.volumeMl = volumeMl;
+    }
 
     @Override
     public String toString() {
-        return "Donation [ID=" + id +
-               ", DonorID=" + donorId +
-               ", Date=" + donationDate +
-               ", Volume=" + volumeMl + "ml]";
+        return String.format("Donation{id=%d, donorId=%d, date=%s, volume=%dml}", id, donorId, date, volumeMl);
     }
 }
